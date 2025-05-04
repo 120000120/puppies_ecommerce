@@ -35,7 +35,7 @@ const Header = () => {
           </ul>
         </nav>
         <a 
-          href="https://wa.me/5543431170" 
+          href="https://wa.me/18099162661" 
           target="_blank" 
           rel="noopener noreferrer" 
           className="hidden md:flex items-center bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors shadow-sm"

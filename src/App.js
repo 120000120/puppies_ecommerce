@@ -8,6 +8,7 @@ import CatalogPage from './pages/Catalog';
 import CatCatalogPage from './pages/CatCatalogPage';
 import ContactPage from './pages/Contact';
 import AdminPage from './pages/AdminPage';
+import PaymentPage from './pages/PaymentPage';
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
           <Route path="/catalogo-gatos" element={<CatCatalogPage />} />
           <Route path="/contacto" element={<ContactPage />} />
           <Route path="/admin" element={<AdminPage />} />
+          <Route path="/payment" element={<PaymentPage />} />
         </Routes>
         <Footer />
         <FloatingWhatsApp />

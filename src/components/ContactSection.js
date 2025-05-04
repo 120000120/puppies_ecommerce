@@ -28,7 +28,7 @@ const ContactSection = () => {
                       Contáctanos directamente por WhatsApp para una respuesta rápida y personalizada.
                     </p>
                     <a 
-                      href="https://wa.me/5543431170" 
+                      href="https://wa.me/18099162661" 
                       target="_blank" 
                       rel="noopener noreferrer" 
                       className="inline-flex items-center text-green-500 hover:text-green-400 font-medium text-lg"
@@ -107,7 +107,7 @@ const ContactSection = () => {
                   </p>
                 </div>
                 <a 
-                  href="https://wa.me/5543431170" 
+                  href="https://wa.me/18099162661" 
                   target="_blank" 
                   rel="noopener noreferrer" 
                   className="inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-lg shadow-lg transition-all transform hover:scale-105 w-full"
