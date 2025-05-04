@@ -19,18 +19,10 @@ const Hero = () => {
             <div className="flex flex-col sm:flex-row gap-4">
               <Link 
                 to="/catalogo" 
-                className="bg-yellow-500 hover:bg-yellow-600 text-black font-medium py-3 px-6 rounded-lg shadow-md transition-all transform hover:scale-105 text-center"
+                className="bg-white hover:bg-yellow-500 text-black font-medium py-3 px-6 rounded-lg shadow-md transition-all transform hover:scale-105 text-center"
               >
                 Ver catálogo
               </Link>
-              <a 
-                href="https://wa.me/18099162661" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="bg-yellow-500 hover:bg-yellow-600 text-black font-medium py-2 px-4 rounded-lg transition-colors"
-              >
-                Contactar por WhatsApp
-              </a>
             </div>
           </div>
           <div className="md:w-1/2 relative">
