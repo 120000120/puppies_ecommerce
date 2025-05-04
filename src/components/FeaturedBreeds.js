@@ -100,7 +100,7 @@ const FeaturedBreeds = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-bold text-yellow-400">{formatPrice(dog.price)}</span>
                   <a 
-                    href={`https://wa.me/18099162661?text=${encodeURIComponent(`Hola, estoy interesado en este hermoso cachorrito ${dog.name} 🐕\n\n${dog.image}`)}`} 
+                    href={`https://wa.me/50661537799?text=${encodeURIComponent(`Hola, estoy interesado en este hermoso cachorrito ${dog.name} 🐕\n\n${dog.image}`)}`} 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className="bg-yellow-500 hover:bg-yellow-600 text-black font-medium py-2 px-4 rounded-lg transition-colors"

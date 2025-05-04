@@ -63,7 +63,7 @@ const CatCard = ({ cat }) => {
               Comprar
             </Link>
             <a
-              href={`https://wa.me/18099162661?text=${encodeURIComponent(`Hola, estoy interesado en este hermoso gatito ${cat.name} 🐱\n\n${cat.image}`)}`}
+              href={`https://wa.me/50661537799?text=${encodeURIComponent(`Hola, estoy interesado en este hermoso gatito ${cat.name} 🐱\n\n${cat.image}`)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
