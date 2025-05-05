@@ -1,19 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 
-// Configurar Axios
-const api = axios.create({
-  baseURL: 'http://localhost:3001',
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  }
-});
-
-// Inicializar Stripe
-const stripePromise = loadStripe('pk_live_51R9JjG02kJcG0b7cgStRwVRq8Ynsa3g1tojAiIlW1ahYqzL3Afg5LhIfEdlrXqkVV7gYmp4bv25nI0Z2n5IU673I00EZVaZJg4');
+// Inicializar Stripe con la clave pública
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
 
 function PaymentPage() {
   const location = useLocation();
@@ -36,20 +26,41 @@ function PaymentPage() {
     setStripeError(null);
 
     try {
-      const response = await api.post('/api/stripe', {
-        price: dog.price,
-        email: 'test@example.com',
-        product_data: {
-          name: dog.name,
-          description: dog.characteristics,
-          images: [dog.image]
-        }
+      const stripe = await stripePromise;
+      
+      const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': `Bearer ${process.env.REACT_APP_STRIPE_SECRET_KEY}`
+        },
+        body: new URLSearchParams({
+          'payment_method_types[]': 'card',
+          'line_items[0][price_data][currency]': 'usd',
+          'line_items[0][price_data][product_data][name]': dog.name,
+          'line_items[0][price_data][product_data][description]': dog.characteristics,
+          'line_items[0][price_data][product_data][images][]': dog.image,
+          'line_items[0][price_data][unit_amount]': Math.round(dog.price * 100),
+          'line_items[0][quantity]': '1',
+          'mode': 'payment',
+          'success_url': `${window.location.origin}/success?success=true`,
+          'cancel_url': `${window.location.origin}/cancel`,
+          'customer_email': 'test@example.com'
+        })
       });
 
-      if (response.data.sessionUrl) {
-        window.location.href = response.data.sessionUrl;
-      } else {
-        throw new Error('No se pudo obtener la URL de pago');
+      const session = await response.json();
+      
+      if (session.error) {
+        throw new Error(session.error.message);
+      }
+
+      const result = await stripe.redirectToCheckout({
+        sessionId: session.id
+      });
+
+      if (result.error) {
+        throw new Error(result.error.message);
       }
     } catch (error) {
       console.error('Error:', error);
