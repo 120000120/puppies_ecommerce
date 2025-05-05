@@ -5,22 +5,22 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="bg-black text-white py-4 px-4 md:px-8">
+    <header className="bg-yellow-500 text-black py-4 px-4 md:px-8">
       <div className="container mx-auto flex justify-between items-center">
         <Link to="/" className="flex items-center">
           <img src="/imagen.png" alt="Best Family Puppies Logo" className="h-16 md:h-12 w-auto" />
-          <span className="hidden md:block ml-4 text-xl font-bold">Best Family Puppies</span>
+          <span className="hidden md:block ml-4 text-xl font-bold text-black">Best Family Puppies</span>
         </Link>
 
         <div className="hidden md:flex space-x-8">
-          <Link to="/" className="hover:text-yellow-400 transition-colors">Inicio</Link>
-          <Link to="/catalogo" className="hover:text-yellow-400 transition-colors">Perros</Link>
-          <Link to="/catalogo-gatos" className="hover:text-yellow-400 transition-colors">Gatos</Link>
-          <Link to="/contacto" className="hover:text-yellow-400 transition-colors">Contacto</Link>
+          <Link to="/" className="hover:text-gray-800 transition-colors font-bold">Inicio</Link>
+          <Link to="/catalogo" className="hover:text-gray-800 transition-colors font-bold">Perros</Link>
+          <Link to="/catalogo-gatos" className="hover:text-gray-800 transition-colors font-bold">Gatos</Link>
+          <Link to="/contacto" className="hover:text-gray-800 transition-colors font-bold">Contacto</Link>
         </div>
 
         <button
-          className="md:hidden text-white"
+          className="md:hidden text-black"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
           <svg
@@ -51,10 +51,10 @@ const Header = () => {
 
       {/* Menú móvil */}
       {isMenuOpen && (
-        <div className="md:hidden fixed inset-0 bg-black bg-opacity-90 z-50">
+        <div className="md:hidden fixed inset-0 bg-yellow-500 bg-opacity-90 z-50">
           <div className="flex flex-col items-center justify-center h-full space-y-8">
             <button
-              className="absolute top-4 right-4 text-white"
+              className="absolute top-4 right-4 text-black"
               onClick={() => setIsMenuOpen(false)}
             >
               <svg
@@ -74,28 +74,28 @@ const Header = () => {
             </button>
             <Link
               to="/"
-              className="text-2xl hover:text-yellow-400 transition-colors"
+              className="text-2xl hover:text-gray-800 transition-colors font-medium"
               onClick={() => setIsMenuOpen(false)}
             >
               Inicio
             </Link>
             <Link
               to="/catalogo"
-              className="text-2xl hover:text-yellow-400 transition-colors"
+              className="text-2xl hover:text-gray-800 transition-colors font-medium"
               onClick={() => setIsMenuOpen(false)}
             >
               Perros
             </Link>
             <Link
               to="/catalogo-gatos"
-              className="text-2xl hover:text-yellow-400 transition-colors"
+              className="text-2xl hover:text-gray-800 transition-colors font-medium"
               onClick={() => setIsMenuOpen(false)}
             >
               Gatos
             </Link>
             <Link
               to="/contacto"
-              className="text-2xl hover:text-yellow-400 transition-colors"
+              className="text-2xl hover:text-gray-800 transition-colors font-medium"
               onClick={() => setIsMenuOpen(false)}
             >
               Contacto

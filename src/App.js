@@ -9,6 +9,8 @@ import CatCatalogPage from './pages/CatCatalogPage';
 import ContactPage from './pages/Contact';
 import AdminPage from './pages/AdminPage';
 import PaymentPage from './pages/PaymentPage';
+import SuccessPage from './pages/SuccessPage';
+import CancelPage from './pages/CancelPage';
 
 const App = () => {
   return (
@@ -22,6 +24,8 @@ const App = () => {
           <Route path="/contacto" element={<ContactPage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/payment" element={<PaymentPage />} />
+          <Route path="/success" element={<SuccessPage />} />
+          <Route path="/cancel" element={<CancelPage />} />
         </Routes>
         <Footer />
         <FloatingWhatsApp />

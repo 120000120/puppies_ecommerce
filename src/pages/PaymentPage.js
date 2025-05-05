@@ -1,200 +1,121 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { loadStripe } from '@stripe/stripe-js';
 import { useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
-const PaymentPage = () => {
+// Configurar Axios
+const api = axios.create({
+  baseURL: 'http://localhost:3001',
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  }
+});
+
+// Inicializar Stripe
+const stripePromise = loadStripe('pk_live_51R9JjG02kJcG0b7cgStRwVRq8Ynsa3g1tojAiIlW1ahYqzL3Afg5LhIfEdlrXqkVV7gYmp4bv25nI0Z2n5IU673I00EZVaZJg4');
+
+function PaymentPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    country: ''
-  });
-
-  const [pet, setPet] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [stripeError, setStripeError] = useState(null);
+  
+  const { dog } = location.state || {};
 
   useEffect(() => {
-    if (location.state?.pet) {
-      setPet(location.state.pet);
-    } else {
-      navigate('/');
+    if (!dog) {
+      navigate('/catalogo');
+      return;
     }
-  }, [location, navigate]);
+  }, [dog, navigate]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = (e) => {
+  const handlePayment = async (e) => {
     e.preventDefault();
-    // Aquí podrías implementar la lógica para guardar los datos del cliente
-    alert('¡Gracias por tu compra! Te enviaremos un correo con los detalles del pago.');
-    navigate('/');
+    setIsLoading(true);
+    setStripeError(null);
+
+    try {
+      const response = await api.post('/api/stripe', {
+        price: dog.price,
+        email: 'test@example.com',
+        product_data: {
+          name: dog.name,
+          description: dog.characteristics,
+          images: [dog.image]
+        }
+      });
+
+      if (response.data.sessionUrl) {
+        window.location.href = response.data.sessionUrl;
+      } else {
+        throw new Error('No se pudo obtener la URL de pago');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setStripeError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  if (!pet) return null;
+  if (!dog) {
+    return null;
+  }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-gray-800 rounded-lg shadow-xl overflow-hidden">
-          <div className="p-8">
-            <h1 className="text-3xl font-bold text-yellow-400 mb-8">Proceso de Compra</h1>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Información del producto */}
-              <div className="bg-gray-700 p-6 rounded-lg">
-                <h2 className="text-xl font-bold text-yellow-400 mb-4">Detalles del Producto</h2>
-                <div className="aspect-w-16 aspect-h-9 mb-4">
-                  <img src={pet.image} alt={pet.name} className="w-full h-full object-cover rounded-lg" />
-                </div>
-                <h3 className="text-lg font-bold mb-2">{pet.name}</h3>
-                <p className="text-gray-300 mb-2">{pet.characteristics}</p>
-                <div className="text-yellow-400 text-xl font-bold">
-                  {new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: 'USD'
-                  }).format(pet.price)}
-                </div>
-              </div>
+    <div className="max-w-4xl mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-8 text-yellow-400">Completar Compra</h1>
+      
+      {stripeError && (
+        <div className="mb-4 p-4 bg-red-500/10 border border-red-400 text-red-400 rounded-lg">
+          {stripeError}
+        </div>
+      )}
 
-              {/* Formulario de pago */}
-              <div>
-                <h2 className="text-xl font-bold text-yellow-400 mb-4">Información de Contacto</h2>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Nombre completo</label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Correo electrónico</label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Teléfono</label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Dirección</label>
-                    <input
-                      type="text"
-                      name="address"
-                      value={formData.address}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                      required
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1">Ciudad</label>
-                      <input
-                        type="text"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1">Estado</label>
-                      <input
-                        type="text"
-                        name="state"
-                        value={formData.state}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1">Código Postal</label>
-                      <input
-                        type="text"
-                        name="zipCode"
-                        value={formData.zipCode}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1">País</label>
-                      <input
-                        type="text"
-                        name="country"
-                        value={formData.country}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="mt-6">
-                    <h3 className="text-lg font-bold text-yellow-400 mb-2">Instrucciones de Pago</h3>
-                    <div className="bg-gray-700 p-4 rounded-lg">
-                      <p className="text-gray-300 mb-2">
-                        Por favor realiza el depósito a la siguiente cuenta:
-                      </p>
-                      <div className="space-y-2">
-                        <p className="text-white"><span className="font-bold">Banco:</span> Bank of America</p>
-                        <p className="text-white"><span className="font-bold">Cuenta:</span> 1234567890</p>
-                        <p className="text-white"><span className="font-bold">Titular:</span> Best Family Puppies</p>
-                        <p className="text-white"><span className="font-bold">Monto:</span> {new Intl.NumberFormat('en-US', {
-                          style: 'currency',
-                          currency: 'USD'
-                        }).format(pet.price)}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-medium py-3 px-4 rounded-lg transition-colors"
-                  >
-                    Confirmar Compra
-                  </button>
-                </form>
-              </div>
-            </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Información del producto */}
+        <div className="bg-gray-800 p-6 rounded-lg border border-yellow-500/20">
+          <h2 className="text-xl font-bold mb-4 text-yellow-400">Detalles del Producto</h2>
+          <div className="aspect-w-16 aspect-h-9 mb-4">
+            <img 
+              src={dog.image} 
+              alt={dog.name} 
+              className="w-full h-full object-cover rounded-lg"
+            />
           </div>
+          <h3 className="text-lg font-bold mb-2 text-white">{dog.name}</h3>
+          <p className="text-gray-300 mb-2">{dog.characteristics}</p>
+          <div className="flex items-center gap-2 mb-4">
+            <span className="bg-yellow-500/10 text-yellow-400 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-yellow-500/20">
+              {dog.size}
+            </span>
+            <span className="text-gray-400 text-sm">Peso: {dog.weight}</span>
+            <span className="text-gray-400 text-sm">Altura: {dog.height}</span>
+          </div>
+          <div className="text-2xl font-bold text-yellow-400">
+            {new Intl.NumberFormat('en-US', {
+              style: 'currency',
+              currency: 'USD',
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 0
+            }).format(dog.price)}
+          </div>
+        </div>
+
+        {/* Botón de pago */}
+        <div className="bg-gray-800 p-6 rounded-lg border border-yellow-500/20 flex items-center justify-center">
+          <button
+            onClick={handlePayment}
+            disabled={isLoading}
+            className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-4 px-8 rounded-lg shadow-lg transition-all transform hover:scale-105 disabled:opacity-50"
+          >
+            {isLoading ? 'Procesando...' : 'Pagar con Stripe'}
+          </button>
         </div>
       </div>
     </div>
   );
-};
+}
 
 export default PaymentPage; 

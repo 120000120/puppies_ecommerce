@@ -27,7 +27,7 @@ const Footer = () => {
           <div className="flex flex-col items-center md:items-end">
             <div className="flex space-x-4 mb-4">
               <a
-                href="https://wa.me/18099162661"
+                href="https://wa.me/50661537799"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-yellow-400 hover:text-yellow-300 transition-colors"
