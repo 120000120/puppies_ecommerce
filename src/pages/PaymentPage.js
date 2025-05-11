@@ -11,6 +11,7 @@ function PaymentPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [stripeError, setStripeError] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [selectedPrice, setSelectedPrice] = useState('usd'); // 'usd' o 'cad'
   
   const { dog, cat } = location.state || {};
 
@@ -37,11 +38,11 @@ function PaymentPage() {
         },
         body: new URLSearchParams({
           'payment_method_types[]': 'card',
-          'line_items[0][price_data][currency]': 'usd',
+          'line_items[0][price_data][currency]': selectedPrice,
           'line_items[0][price_data][product_data][name]': dog ? dog.name : cat.name,
           'line_items[0][price_data][product_data][description]': dog ? dog.characteristics : cat.characteristics,
           'line_items[0][price_data][product_data][images][]': dog ? dog.image_1 : cat.image_1,
-          'line_items[0][price_data][unit_amount]': Math.round((dog ? dog.price : cat.price) * 100),
+          'line_items[0][price_data][unit_amount]': Math.round((dog ? dog.price : (selectedPrice === 'usd' ? cat.price : cat.price_canada)) * 100),
           'line_items[0][quantity]': '1',
           'mode': 'payment',
           'success_url': `${window.location.origin}/success?success=true`,
@@ -116,7 +117,7 @@ function PaymentPage() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Columna izquierda: Imágenes del cachorro */}
+        {/* Columna izquierda: Imágenes */}
         <div className="space-y-4">
           {/* Galería de imágenes */}
           <div className="bg-gray-800 p-3 rounded-lg border border-yellow-500/20">
@@ -170,32 +171,30 @@ function PaymentPage() {
 
         {/* Columna derecha: Información y pago */}
         <div className="space-y-4">
-          {/* Imágenes de los padres (solo para perros) */}
-          {dog && (
-            <div className="bg-gray-800 p-3 rounded-lg border border-yellow-500/20">
-              <h2 className="text-lg font-bold mb-2 text-yellow-400">Imágenes de los Padres</h2>
-              <div className="grid grid-cols-2 gap-2">
-                {dog.image_father_1 && (
-                  <div className="aspect-w-16 aspect-h-10">
-                    <img 
-                      src={dog.image_father_1} 
-                      alt="Padre 1" 
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  </div>
-                )}
-                {dog.image_father_2 && (
-                  <div className="aspect-w-16 aspect-h-10">
-                    <img 
-                      src={dog.image_father_2} 
-                      alt="Padre 2" 
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  </div>
-                )}
-              </div>
+          {/* Imágenes de los padres */}
+          <div className="bg-gray-800 p-3 rounded-lg border border-yellow-500/20">
+            <h2 className="text-lg font-bold mb-2 text-yellow-400">Imágenes de los Padres</h2>
+            <div className="grid grid-cols-2 gap-2">
+              {(dog ? dog.image_father_1 : cat.image_father_1) && (
+                <div className="aspect-w-16 aspect-h-10">
+                  <img 
+                    src={dog ? dog.image_father_1 : cat.image_father_1} 
+                    alt="Padre 1" 
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                </div>
+              )}
+              {(dog ? dog.image_father_2 : cat.image_father_2) && (
+                <div className="aspect-w-16 aspect-h-10">
+                  <img 
+                    src={dog ? dog.image_father_2 : cat.image_father_2} 
+                    alt="Padre 2" 
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                </div>
+              )}
             </div>
-          )}
+          </div>
 
           {/* Información del producto */}
           <div className="bg-gray-800 p-4 rounded-lg border border-yellow-500/20">
@@ -229,14 +228,48 @@ function PaymentPage() {
             <div className="border-t border-gray-700 pt-3 mt-3">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-400">Precio total</span>
-                <span className="text-xl font-bold text-yellow-400">
-                  {new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: 'USD',
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0
-                  }).format(pet.price)}
-                </span>
+                <div className="flex items-center space-x-2">
+                  {cat && (
+                    <div className="flex space-x-2 mr-4">
+                      <button
+                        onClick={() => setSelectedPrice('usd')}
+                        className={`p-1 rounded-md transition-all ${
+                          selectedPrice === 'usd' 
+                            ? 'bg-yellow-500/20 border border-yellow-500' 
+                            : 'hover:bg-gray-700/50'
+                        }`}
+                      >
+                        <img 
+                          src="https://flagcdn.com/w20/us.png" 
+                          alt="USD" 
+                          className="w-6 h-4 object-cover rounded"
+                        />
+                      </button>
+                      <button
+                        onClick={() => setSelectedPrice('cad')}
+                        className={`p-1 rounded-md transition-all ${
+                          selectedPrice === 'cad' 
+                            ? 'bg-yellow-500/20 border border-yellow-500' 
+                            : 'hover:bg-gray-700/50'
+                        }`}
+                      >
+                        <img 
+                          src="https://flagcdn.com/w20/ca.png" 
+                          alt="CAD" 
+                          className="w-6 h-4 object-cover rounded"
+                        />
+                      </button>
+                    </div>
+                  )}
+                  <span className="text-xl font-bold text-yellow-400">
+                    {new Intl.NumberFormat(selectedPrice === 'usd' ? 'en-US' : 'en-CA', {
+                      style: 'currency',
+                      currency: selectedPrice,
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0
+                    }).format(dog ? dog.price : (selectedPrice === 'usd' ? cat.price : cat.price_canada))}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
