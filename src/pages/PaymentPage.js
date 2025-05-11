@@ -10,15 +10,16 @@ function PaymentPage() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [stripeError, setStripeError] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
-  const { dog } = location.state || {};
+  const { dog, cat } = location.state || {};
 
   useEffect(() => {
-    if (!dog) {
+    if (!dog && !cat) {
       navigate('/catalogo');
       return;
     }
-  }, [dog, navigate]);
+  }, [dog, cat, navigate]);
 
   const handlePayment = async (e) => {
     e.preventDefault();
@@ -37,10 +38,10 @@ function PaymentPage() {
         body: new URLSearchParams({
           'payment_method_types[]': 'card',
           'line_items[0][price_data][currency]': 'usd',
-          'line_items[0][price_data][product_data][name]': dog.name,
-          'line_items[0][price_data][product_data][description]': dog.characteristics,
-          'line_items[0][price_data][product_data][images][]': dog.image,
-          'line_items[0][price_data][unit_amount]': Math.round(dog.price * 100),
+          'line_items[0][price_data][product_data][name]': dog ? dog.name : cat.name,
+          'line_items[0][price_data][product_data][description]': dog ? dog.characteristics : cat.characteristics,
+          'line_items[0][price_data][product_data][images][]': dog ? dog.image_1 : cat.image_1,
+          'line_items[0][price_data][unit_amount]': Math.round((dog ? dog.price : cat.price) * 100),
           'line_items[0][quantity]': '1',
           'mode': 'payment',
           'success_url': `${window.location.origin}/success?success=true`,
@@ -70,59 +71,186 @@ function PaymentPage() {
     }
   };
 
-  if (!dog) {
+  const nextImage = () => {
+    setCurrentImageIndex((prevIndex) => 
+      prevIndex === 5 ? 0 : prevIndex + 1
+    );
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prevIndex) => 
+      prevIndex === 0 ? 5 : prevIndex - 1
+    );
+  };
+
+  if (!dog && !cat) {
     return null;
   }
 
+  const images = dog ? [
+    dog.image_1,
+    dog.image_2,
+    dog.image_3,
+    dog.image_4,
+    dog.image_5,
+    dog.image_6
+  ].filter(Boolean) : [
+    cat.image_1,
+    cat.image_2,
+    cat.image_3,
+    cat.image_4,
+    cat.image_5,
+    cat.image_6
+  ].filter(Boolean);
+
+  const pet = dog || cat;
+
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8 text-yellow-400">Completar Compra</h1>
+    <div className="max-w-6xl mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4 text-yellow-400">Completar Adopción</h1>
       
       {stripeError && (
-        <div className="mb-4 p-4 bg-red-500/10 border border-red-400 text-red-400 rounded-lg">
+        <div className="mb-3 p-3 bg-red-500/10 border border-red-400 text-red-400 rounded-lg">
           {stripeError}
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Información del producto */}
-        <div className="bg-gray-800 p-6 rounded-lg border border-yellow-500/20">
-          <h2 className="text-xl font-bold mb-4 text-yellow-400">Detalles del Producto</h2>
-          <div className="aspect-w-16 aspect-h-9 mb-4">
-            <img 
-              src={dog.image} 
-              alt={dog.name} 
-              className="w-full h-full object-cover rounded-lg"
-            />
-          </div>
-          <h3 className="text-lg font-bold mb-2 text-white">{dog.name}</h3>
-          <p className="text-gray-300 mb-2">{dog.characteristics}</p>
-          <div className="flex items-center gap-2 mb-4">
-            <span className="bg-yellow-500/10 text-yellow-400 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-yellow-500/20">
-              {dog.size}
-            </span>
-            <span className="text-gray-400 text-sm">Peso: {dog.weight}</span>
-            <span className="text-gray-400 text-sm">Altura: {dog.height}</span>
-          </div>
-          <div className="text-2xl font-bold text-yellow-400">
-            {new Intl.NumberFormat('en-US', {
-              style: 'currency',
-              currency: 'USD',
-              minimumFractionDigits: 0,
-              maximumFractionDigits: 0
-            }).format(dog.price)}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Columna izquierda: Imágenes del cachorro */}
+        <div className="space-y-4">
+          {/* Galería de imágenes */}
+          <div className="bg-gray-800 p-3 rounded-lg border border-yellow-500/20">
+            <h2 className="text-lg font-bold mb-2 text-yellow-400">Galería de Imágenes</h2>
+            <div className="space-y-2">
+              <div className="relative aspect-w-16 aspect-h-10">
+                <img 
+                  src={images[currentImageIndex]} 
+                  alt={`${pet.name} - Imagen ${currentImageIndex + 1}`}
+                  className="w-full h-full object-cover rounded-lg"
+                />
+                {images.length > 1 && (
+                  <>
+                    <button
+                      onClick={prevImage}
+                      className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-1.5 rounded-full hover:bg-black/70"
+                    >
+                      ←
+                    </button>
+                    <button
+                      onClick={nextImage}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-1.5 rounded-full hover:bg-black/70"
+                    >
+                      →
+                    </button>
+                  </>
+                )}
+              </div>
+              
+              {/* Miniaturas */}
+              <div className="grid grid-cols-6 gap-1">
+                {images.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentImageIndex(index)}
+                    className={`aspect-w-1 aspect-h-1 rounded-lg overflow-hidden border ${
+                      currentImageIndex === index ? 'border-yellow-400' : 'border-transparent'
+                    }`}
+                  >
+                    <img 
+                      src={image} 
+                      alt={`Miniatura ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Botón de pago */}
-        <div className="bg-gray-800 p-6 rounded-lg border border-yellow-500/20 flex items-center justify-center">
-          <button
-            onClick={handlePayment}
-            disabled={isLoading}
-            className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-4 px-8 rounded-lg shadow-lg transition-all transform hover:scale-105 disabled:opacity-50"
-          >
-            {isLoading ? 'Procesando...' : 'Pagar con Stripe'}
-          </button>
+        {/* Columna derecha: Información y pago */}
+        <div className="space-y-4">
+          {/* Imágenes de los padres (solo para perros) */}
+          {dog && (
+            <div className="bg-gray-800 p-3 rounded-lg border border-yellow-500/20">
+              <h2 className="text-lg font-bold mb-2 text-yellow-400">Imágenes de los Padres</h2>
+              <div className="grid grid-cols-2 gap-2">
+                {dog.image_father_1 && (
+                  <div className="aspect-w-16 aspect-h-10">
+                    <img 
+                      src={dog.image_father_1} 
+                      alt="Padre 1" 
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  </div>
+                )}
+                {dog.image_father_2 && (
+                  <div className="aspect-w-16 aspect-h-10">
+                    <img 
+                      src={dog.image_father_2} 
+                      alt="Padre 2" 
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Información del producto */}
+          <div className="bg-gray-800 p-4 rounded-lg border border-yellow-500/20">
+            <h2 className="text-lg font-bold mb-2 text-yellow-400">Detalles del Producto</h2>
+            <h3 className="text-base font-bold mb-1 text-white">{pet.name}</h3>
+            <p className="text-sm text-gray-300 mb-3">{pet.characteristics}</p>
+            
+            <div className="grid grid-cols-2 gap-2 mb-3">
+              <div className="bg-gray-700/50 p-2 rounded-lg">
+                <span className="text-xs text-gray-400 block mb-0.5">Tamaño</span>
+                <span className="text-sm text-white font-medium">{pet.size}</span>
+              </div>
+              {dog && (
+                <>
+                  <div className="bg-gray-700/50 p-2 rounded-lg">
+                    <span className="text-xs text-gray-400 block mb-0.5">Peso</span>
+                    <span className="text-sm text-white font-medium">{dog.weight}</span>
+                  </div>
+                  <div className="bg-gray-700/50 p-2 rounded-lg">
+                    <span className="text-xs text-gray-400 block mb-0.5">Altura</span>
+                    <span className="text-sm text-white font-medium">{dog.height}</span>
+                  </div>
+                  <div className="bg-gray-700/50 p-2 rounded-lg">
+                    <span className="text-xs text-gray-400 block mb-0.5">Camadas</span>
+                    <span className="text-sm text-white font-medium">{dog.litters}</span>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="border-t border-gray-700 pt-3 mt-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-400">Precio total</span>
+                <span className="text-xl font-bold text-yellow-400">
+                  {new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                  }).format(pet.price)}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Botón de pago */}
+          <div className="bg-gray-800 p-4 rounded-lg border border-yellow-500/20">
+            <button
+              onClick={handlePayment}
+              disabled={isLoading}
+              className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 px-6 rounded-lg shadow-lg transition-all transform hover:scale-105 disabled:opacity-50"
+            >
+              {isLoading ? 'Procesando...' : 'Adoptar ahora'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

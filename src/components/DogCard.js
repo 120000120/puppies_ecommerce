@@ -14,7 +14,7 @@ const DogCard = ({ dog }) => {
     console.log('Datos del perro antes de la navegación:', {
       ...dog,
       price: parseFloat(dog.price),
-      image: dog.image || '',
+      image_1: dog.image_1 || '',
       name: dog.name || '',
       characteristics: dog.characteristics || '',
       size: dog.size || '',
@@ -28,7 +28,7 @@ const DogCard = ({ dog }) => {
     <div className="group bg-gray-800 text-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
       <div className="relative h-64 overflow-hidden">
         <img 
-          src={dog.image} 
+          src={dog.image_1} 
           alt={dog.name} 
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
@@ -78,7 +78,7 @@ const DogCard = ({ dog }) => {
                 dog: {
                   ...dog,
                   price: parseFloat(dog.price),
-                  image: dog.image || '',
+                  image_1: dog.image_1 || '',
                   name: dog.name || '',
                   characteristics: dog.characteristics || '',
                   size: dog.size || '',
@@ -90,13 +90,13 @@ const DogCard = ({ dog }) => {
               onClick={handleClick}
               className="inline-flex items-center bg-yellow-500 hover:bg-yellow-600 text-black font-medium py-2.5 px-5 rounded-lg transition-all duration-300 hover:shadow-lg hover:scale-105"
             >
-              Comprar
+              Adoptar
               <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
               </svg>
             </Link>
             <a
-              href={`https://wa.me/50661537799?text=${encodeURIComponent(`Hola, estoy interesado en este hermoso cachorrito ${dog.name} 🐕\n\n${dog.image}`)}`}
+              href={`https://wa.me/50661537799?text=${encodeURIComponent(`Hola, estoy interesado en este hermoso cachorrito ${dog.name} 🐕\n\n${dog.image_1}`)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-gray-400 hover:text-green-400 transition-colors duration-300 flex items-center"
