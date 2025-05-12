@@ -64,7 +64,7 @@ const Catalog = () => {
     <section id="catalog" className="py-16 bg-black text-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-yellow-400 mb-4">Nuestro Catálogo</h2>
+          <h2 className="text-3xl font-bold text-yellow-400 mb-4">Nuestros Cachorros</h2>
           <p className="text-gray-300 max-w-2xl mx-auto">
             Explora nuestra amplia selección de cachorros disponibles para encontrar tu compañero perfecto.
           </p>

@@ -67,8 +67,8 @@ const DogCard = ({ dog }) => {
       
       <div className="p-6">
         <div className="flex justify-between items-start mb-3">
-          <h3 className="text-xl font-bold text-white truncate">{dog.name}</h3>
-          <span className="bg-yellow-500/10 text-yellow-400 text-xs font-semibold px-3 py-1 rounded-full border border-yellow-500/20">
+          <h3 className="text-xl font-bold text-white line-clamp-2 min-h-[3rem] pr-2">{dog.name}</h3>
+          <span className="bg-yellow-500/10 text-yellow-400 text-xs font-semibold px-3 py-1 rounded-full border border-yellow-500/20 flex-shrink-0">
             {dog.size}
           </span>
         </div>
