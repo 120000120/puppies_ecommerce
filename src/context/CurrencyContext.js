@@ -1,69 +1,94 @@
-import { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const CurrencyContext = createContext();
 
+export const useCurrency = () => useContext(CurrencyContext);
+
 export const CurrencyProvider = ({ children }) => {
   const [selectedCurrency, setSelectedCurrency] = useState('usd');
+  const [isLoading, setIsLoading] = useState(true);
 
-  const getPriceByCurrency = (item) => {
-    if (!item) return null;
+  useEffect(() => {
+    const detectUserCountry = async () => {
+      try {
+        // Primero obtenemos la IP del usuario
+        const ipResponse = await fetch('https://api.ipify.org?format=json');
+        const { ip } = await ipResponse.json();
 
-    // Si la moneda seleccionada es CRC y el precio es mayor a 4 dígitos
-    if (selectedCurrency === 'crc' && parseFloat(item.price_costa_rica) > 9999) {
-      return item.price_costa_rica;
-    }
-    // Si la moneda seleccionada es CRC y el precio es menor o igual a 4 dígitos
-    else if (selectedCurrency === 'crc' && parseFloat(item.price_costa_rica) <= 9999) {
-      return item.price;
-    }
-    // Para otras monedas
-    else {
-      switch (selectedCurrency) {
-        case 'usd':
-          return item.price;
-        case 'cad':
-          return item.price_canada;
-        case 'nio':
-          return item.price_nicaragua;
-        case 'pab':
-          return item.price_panama;
-        default:
-          return item.price;
+        // Luego obtenemos el país basado en la IP
+        const countryResponse = await fetch(`https://ipapi.co/${ip}/country/`);
+        const country = await countryResponse.text();
+
+        // Mapeamos el país a la moneda correspondiente
+        const countryToCurrency = {
+          'US': 'usd',
+          'CA': 'cad',
+          'PA': 'pab',
+          'NI': 'nio',
+          'CR': 'crc'
+        };
+
+        const detectedCurrency = countryToCurrency[country];
+        if (detectedCurrency) {
+          setSelectedCurrency(detectedCurrency);
+        }
+      } catch (error) {
+        console.error('Error detecting user country:', error);
+        // Si hay error, mantenemos USD como default
+        setSelectedCurrency('usd');
+      } finally {
+        setIsLoading(false);
       }
+    };
+
+    detectUserCountry();
+  }, []);
+
+  const getPriceByCurrency = (pet) => {
+    if (!pet) return 0;
+
+    // Si es Canadá y es un perro, siempre devolvemos el precio en USD
+    if (selectedCurrency === 'cad' && pet.hasOwnProperty('weight')) {
+      return pet.price;
     }
+
+    const priceMap = {
+      usd: pet.price,
+      cad: pet.price_canada,
+      pab: pet.price_panama,
+      nio: pet.price_nicaragua,
+      crc: pet.price_costa_rica
+    };
+
+    return priceMap[selectedCurrency] || pet.price;
   };
 
-  const getDisplayCurrency = (item) => {
-    if (!item) return selectedCurrency;
+  const getDisplayCurrency = (pet) => {
+    if (!pet) return selectedCurrency;
 
-    // Si la moneda seleccionada es CRC y el precio es mayor a 4 dígitos
-    if (selectedCurrency === 'crc' && parseFloat(item.price_costa_rica) > 9999) {
-      return 'crc';
-    }
-    // Si la moneda seleccionada es CRC y el precio es menor o igual a 4 dígitos
-    else if (selectedCurrency === 'crc' && parseFloat(item.price_costa_rica) <= 9999) {
+    // Si es Canadá y es un perro, siempre mostramos USD
+    if (selectedCurrency === 'cad' && pet.hasOwnProperty('weight')) {
       return 'usd';
     }
-    // Para otras monedas
+
+    // Lógica especial para Costa Rica
+    if (selectedCurrency === 'crc') {
+      const price = getPriceByCurrency(pet);
+      return price > 9999 ? 'crc' : 'usd';
+    }
+
     return selectedCurrency;
   };
 
   return (
-    <CurrencyContext.Provider value={{ 
-      selectedCurrency, 
-      setSelectedCurrency, 
+    <CurrencyContext.Provider value={{
+      selectedCurrency,
+      setSelectedCurrency,
       getPriceByCurrency,
-      getDisplayCurrency 
+      getDisplayCurrency,
+      isLoading
     }}>
       {children}
     </CurrencyContext.Provider>
   );
-};
-
-export const useCurrency = () => {
-  const context = useContext(CurrencyContext);
-  if (!context) {
-    throw new Error('useCurrency must be used within a CurrencyProvider');
-  }
-  return context;
 }; 

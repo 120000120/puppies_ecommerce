@@ -5,7 +5,7 @@ import { useCurrency } from '../context/CurrencyContext';
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { selectedCurrency, setSelectedCurrency } = useCurrency();
+  const { selectedCurrency, setSelectedCurrency, isLoading } = useCurrency();
 
   const currencies = [
     { code: 'usd', name: 'Estados Unidos', flag: 'https://flagcdn.com/w20/us.png' },
@@ -35,26 +35,32 @@ const Header = () => {
           <div className="relative">
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center space-x-2 hover:text-gray-800 transition-colors font-bold"
+              className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors border border-white text-white"
             >
-              <img 
-                src={selectedCurrencyInfo.flag} 
-                alt={selectedCurrencyInfo.name} 
-                className="w-6 h-4 object-cover rounded"
-              />
-              <span>{selectedCurrencyInfo.code.toUpperCase()}</span>
-              <svg 
-                className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} 
-                fill="none" 
-                stroke="currentColor" 
+              {isLoading ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+              ) : (
+                <>
+                  <img
+                    src={currencies.find(c => c.code === selectedCurrency)?.flag}
+                    alt={currencies.find(c => c.code === selectedCurrency)?.name}
+                    className="w-6 h-4 object-cover rounded"
+                  />
+                  <span className="text-sm text-white">{currencies.find(c => c.code === selectedCurrency)?.name}</span>
+                </>
+              )}
+              <svg
+                className={`w-4 h-4 transform transition-transform ${isDropdownOpen ? 'rotate-180' : ''} text-yellow-400`}
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
-
-            {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-50">
+            
+            {isDropdownOpen && !isLoading && (
+              <div className="absolute right-0 mt-2 w-48 bg-gray-700 rounded-lg shadow-lg py-2 z-50 border border-white">
                 {currencies.map((currency) => (
                   <button
                     key={currency.code}
@@ -62,16 +68,16 @@ const Header = () => {
                       setSelectedCurrency(currency.code);
                       setIsDropdownOpen(false);
                     }}
-                    className={`w-full px-4 py-2 text-left hover:bg-gray-100 flex items-center space-x-2 ${
-                      selectedCurrency === currency.code ? 'bg-yellow-100' : ''
+                    className={`w-full px-4 py-2 text-left hover:bg-gray-600 flex items-center space-x-2 text-white ${
+                      selectedCurrency === currency.code ? 'bg-gray-600' : ''
                     }`}
                   >
-                    <img 
-                      src={currency.flag} 
-                      alt={currency.name} 
+                    <img
+                      src={currency.flag}
+                      alt={currency.name}
                       className="w-6 h-4 object-cover rounded"
                     />
-                    <span>{currency.name}</span>
+                    <span className="text-sm text-white">{currency.name}</span>
                   </button>
                 ))}
               </div>
