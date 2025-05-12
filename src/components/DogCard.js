@@ -1,14 +1,44 @@
 import { Link } from 'react-router-dom';
+import { useCurrency } from '../context/CurrencyContext';
 
 const DogCard = ({ dog }) => {
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(price);
+  const { getPriceByCurrency, getDisplayCurrency } = useCurrency();
+  const price = getPriceByCurrency(dog);
+  const displayCurrency = getDisplayCurrency(dog);
+
+  const getCurrencyInfo = (currency) => {
+    switch (currency) {
+      case 'usd':
+        return { country: 'Estados Unidos', symbol: 'USD' };
+      case 'cad':
+        return { country: 'Canadá', symbol: 'CAD' };
+      case 'crc':
+        return { country: 'Costa Rica', symbol: 'CRC' };
+      case 'nio':
+        return { country: 'Nicaragua', symbol: 'NIO' };
+      case 'pab':
+        return { country: 'Panamá', symbol: 'PAB' };
+      default:
+        return { country: 'Estados Unidos', symbol: 'USD' };
+    }
   };
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat(
+      displayCurrency === 'usd' ? 'en-US' : 
+      displayCurrency === 'cad' ? 'en-CA' : 
+      displayCurrency === 'crc' ? 'es-CR' :
+      displayCurrency === 'nio' ? 'es-NI' :
+      'es-PA', {
+        style: 'currency',
+        currency: displayCurrency.toUpperCase(),
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }
+    ).format(price);
+  };
+
+  const currencyInfo = getCurrencyInfo(displayCurrency);
 
   const handleClick = () => {
     console.log('Datos del perro antes de la navegación:', {
@@ -66,10 +96,10 @@ const DogCard = ({ dog }) => {
           </div>
         </div>
         
-        <div className="flex justify-between items-center">
-          <div className="flex items-baseline">
-            <span className="text-2xl font-bold text-yellow-400">{formatPrice(dog.price)}</span>
-            <span className="text-xs text-gray-400 ml-1">USD</span>
+        <div className="mt-4 flex justify-between items-center">
+          <div className="flex flex-col">
+            <span className="text-2xl font-bold text-yellow-500">{formatPrice(price)}</span>
+            <span className="text-xs text-gray-400 mt-1">{currencyInfo.country} - {currencyInfo.symbol}</span>
           </div>
           <div className="flex flex-col items-end space-y-2">
             <Link

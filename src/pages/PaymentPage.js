@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useCurrency } from '../context/CurrencyContext';
 
 // Inicializar Stripe con la clave pública
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
@@ -11,7 +12,7 @@ function PaymentPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [stripeError, setStripeError] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [selectedPrice, setSelectedPrice] = useState('usd'); // 'usd' o 'cad'
+  const { selectedCurrency, getPriceByCurrency } = useCurrency();
   
   const { dog, cat } = location.state || {};
 
@@ -29,6 +30,8 @@ function PaymentPage() {
 
     try {
       const stripe = await stripePromise;
+      const pet = dog || cat;
+      const price = getPriceByCurrency(pet);
       
       const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
         method: 'POST',
@@ -38,11 +41,11 @@ function PaymentPage() {
         },
         body: new URLSearchParams({
           'payment_method_types[]': 'card',
-          'line_items[0][price_data][currency]': selectedPrice,
-          'line_items[0][price_data][product_data][name]': dog ? dog.name : cat.name,
-          'line_items[0][price_data][product_data][description]': dog ? dog.characteristics : cat.characteristics,
-          'line_items[0][price_data][product_data][images][]': dog ? dog.image_1 : cat.image_1,
-          'line_items[0][price_data][unit_amount]': Math.round((dog ? dog.price : (selectedPrice === 'usd' ? cat.price : cat.price_canada)) * 100),
+          'line_items[0][price_data][currency]': selectedCurrency,
+          'line_items[0][price_data][product_data][name]': pet.name,
+          'line_items[0][price_data][product_data][description]': pet.characteristics,
+          'line_items[0][price_data][product_data][images][]': pet.image_1,
+          'line_items[0][price_data][unit_amount]': Math.round(price * 100),
           'line_items[0][quantity]': '1',
           'mode': 'payment',
           'success_url': `${window.location.origin}/success?success=true`,
@@ -105,6 +108,7 @@ function PaymentPage() {
   ].filter(Boolean);
 
   const pet = dog || cat;
+  const price = getPriceByCurrency(pet);
 
   return (
     <div className="max-w-6xl mx-auto p-4">
@@ -229,45 +233,17 @@ function PaymentPage() {
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-400">Precio total</span>
                 <div className="flex items-center space-x-2">
-                  {cat && (
-                    <div className="flex space-x-2 mr-4">
-                      <button
-                        onClick={() => setSelectedPrice('usd')}
-                        className={`p-1 rounded-md transition-all ${
-                          selectedPrice === 'usd' 
-                            ? 'bg-yellow-500/20 border border-yellow-500' 
-                            : 'hover:bg-gray-700/50'
-                        }`}
-                      >
-                        <img 
-                          src="https://flagcdn.com/w20/us.png" 
-                          alt="USD" 
-                          className="w-6 h-4 object-cover rounded"
-                        />
-                      </button>
-                      <button
-                        onClick={() => setSelectedPrice('cad')}
-                        className={`p-1 rounded-md transition-all ${
-                          selectedPrice === 'cad' 
-                            ? 'bg-yellow-500/20 border border-yellow-500' 
-                            : 'hover:bg-gray-700/50'
-                        }`}
-                      >
-                        <img 
-                          src="https://flagcdn.com/w20/ca.png" 
-                          alt="CAD" 
-                          className="w-6 h-4 object-cover rounded"
-                        />
-                      </button>
-                    </div>
-                  )}
                   <span className="text-xl font-bold text-yellow-400">
-                    {new Intl.NumberFormat(selectedPrice === 'usd' ? 'en-US' : 'en-CA', {
+                    {new Intl.NumberFormat(selectedCurrency === 'usd' ? 'en-US' : 
+                      selectedCurrency === 'cad' ? 'en-CA' : 
+                      selectedCurrency === 'crc' ? 'es-CR' :
+                      selectedCurrency === 'nio' ? 'es-NI' :
+                      'es-PA', {
                       style: 'currency',
-                      currency: selectedPrice,
+                      currency: selectedCurrency.toUpperCase(),
                       minimumFractionDigits: 0,
                       maximumFractionDigits: 0
-                    }).format(dog ? dog.price : (selectedPrice === 'usd' ? cat.price : cat.price_canada))}
+                    }).format(price)}
                   </span>
                 </div>
               </div>

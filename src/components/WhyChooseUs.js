@@ -42,7 +42,7 @@ const WhyChooseUs = () => {
             </div>
             <h3 className="text-xl font-bold text-white mb-3">Soporte Continuo</h3>
             <p className="text-gray-400">
-              Ofrecemos asesoramiento y apoyo después de la compra para asegurar que tu cachorro se adapte perfectamente a su nuevo hogar.
+              Ofrecemos asesoramiento y apoyo después de la adopción para asegurar que tu cachorro se adapte perfectamente a su nuevo hogar.
             </p>
           </div>
         </div>

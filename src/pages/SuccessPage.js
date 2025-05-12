@@ -19,15 +19,15 @@ const SuccessPage = () => {
             </h1>
             
             <p className="text-gray-300 text-lg mb-8">
-              Gracias por tu compra. Hemos recibido tu pago correctamente.
+              Gracias por tu adopción. Hemos recibido tu pago correctamente.
             </p>
             
             <div className="bg-gray-700/50 rounded-lg p-6 mb-8 border border-yellow-500/20">
               <h2 className="text-xl font-semibold text-yellow-400 mb-4">
-                Detalles de tu compra
+                Detalles de tu adopción
               </h2>
               <div className="space-y-3 text-gray-300">
-                <p>Recibirás un correo electrónico con los detalles de tu compra.</p>
+                <p>Recibirás un correo electrónico con los detalles de tu adopción.</p>
                 <p>Nuestro equipo se pondrá en contacto contigo pronto para coordinar la entrega.</p>
               </div>
             </div>

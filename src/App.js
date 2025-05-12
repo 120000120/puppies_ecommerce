@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { CurrencyProvider } from './context/CurrencyContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import FloatingWhatsApp from './components/FloatingWhatsApp';
@@ -14,23 +15,25 @@ import CancelPage from './pages/CancelPage';
 
 const App = () => {
   return (
-    <Router>
-      <div className="min-h-screen bg-black text-white">
-        <Header />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/catalogo" element={<CatalogPage />} />
-          <Route path="/catalogo-gatos" element={<CatCatalogPage />} />
-          <Route path="/contacto" element={<ContactPage />} />
-          <Route path="/admin" element={<AdminPage />} />
-          <Route path="/payment" element={<PaymentPage />} />
-          <Route path="/success" element={<SuccessPage />} />
-          <Route path="/cancel" element={<CancelPage />} />
-        </Routes>
-        <Footer />
-        <FloatingWhatsApp />
-      </div>
-    </Router>
+    <CurrencyProvider>
+      <Router>
+        <div className="min-h-screen bg-black">
+          <Header />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/catalogo" element={<CatalogPage />} />
+            <Route path="/catalogo-gatos" element={<CatCatalogPage />} />
+            <Route path="/contacto" element={<ContactPage />} />
+            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/payment" element={<PaymentPage />} />
+            <Route path="/success" element={<SuccessPage />} />
+            <Route path="/cancel" element={<CancelPage />} />
+          </Routes>
+          <Footer />
+          <FloatingWhatsApp />
+        </div>
+      </Router>
+    </CurrencyProvider>
   );
 };
 
