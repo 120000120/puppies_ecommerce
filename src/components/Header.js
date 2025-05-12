@@ -26,10 +26,10 @@ const Header = () => {
         </Link>
 
         <div className="hidden md:flex items-center space-x-8">
-          <Link to="/" className="hover:text-gray-800 transition-colors font-bold">Inicio</Link>
-          <Link to="/catalogo" className="hover:text-gray-800 transition-colors font-bold">Perros</Link>
-          <Link to="/catalogo-gatos" className="hover:text-gray-800 transition-colors font-bold">Gatos</Link>
-          <Link to="/contacto" className="hover:text-gray-800 transition-colors font-bold">Contacto</Link>
+          <Link to="/" className="hover:text-gray-800 transition-colors font-semibold">Inicio</Link>
+          <Link to="/catalogo" className="hover:text-gray-800 transition-colors font-semibold">Perros</Link>
+          <Link to="/catalogo-gatos" className="hover:text-gray-800 transition-colors font-semibold">Gatos</Link>
+          <Link to="/contacto" className="hover:text-gray-800 transition-colors font-semibold">Contacto</Link>
           
           {/* Dropdown de monedas */}
           <div className="relative">

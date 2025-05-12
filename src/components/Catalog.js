@@ -63,11 +63,22 @@ const Catalog = () => {
   return (
     <section id="catalog" className="py-16 bg-black text-white">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-yellow-400 mb-4">Nuestros Cachorros</h2>
-          <p className="text-gray-300 max-w-2xl mx-auto">
-            Explora nuestra amplia selección de cachorros disponibles para encontrar tu compañero perfecto.
-          </p>
+        <div className="flex flex-col md:flex-row items-center gap-8 mb-12">
+          <div className="text-center md:text-left flex-1">
+            <h2 className="text-3xl font-bold text-yellow-400 mb-4">Nuestros Cachorros</h2>
+            <p className="text-gray-300">
+              Explora nuestra amplia selección de cachorros disponibles para encontrar tu compañero perfecto.
+            </p>
+          </div>
+          
+          {/* Banner Image */}
+          <div className="rounded-xl overflow-hidden shadow-lg w-full md:w-[400px]">
+            <img 
+              src="/banner.jpg" 
+              alt="Best Family Puppies Banner" 
+              className="w-full h-[200px] object-contain"
+            />
+          </div>
         </div>
         
         <div className="bg-gray-800 rounded-xl shadow-md p-6 mb-8">
