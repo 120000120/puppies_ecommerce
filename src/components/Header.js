@@ -117,14 +117,14 @@ const Header = () => {
 
       {/* Menú móvil */}
       {isMenuOpen && (
-        <div className="md:hidden fixed inset-0 bg-yellow-500 bg-opacity-90 z-50">
+        <div className="md:hidden fixed inset-0 bg-black/95 backdrop-blur-sm z-50">
           <div className="flex flex-col items-center justify-center h-full space-y-8">
             <button
-              className="absolute top-4 right-4 text-black"
+              className="absolute top-6 right-6 text-yellow-400 hover:text-yellow-300 transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
               <svg
-                className="w-6 h-6"
+                className="w-8 h-8"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -138,80 +138,92 @@ const Header = () => {
                 />
               </svg>
             </button>
-            <Link
-              to="/"
-              className="text-2xl hover:text-gray-800 transition-colors font-medium"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Inicio
-            </Link>
-            <Link
-              to="/catalogo"
-              className="text-2xl hover:text-gray-800 transition-colors font-medium"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Perros
-            </Link>
-            <Link
-              to="/catalogo-gatos"
-              className="text-2xl hover:text-gray-800 transition-colors font-medium"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Gatos
-            </Link>
-            <Link
-              to="/contacto"
-              className="text-2xl hover:text-gray-800 transition-colors font-medium"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Contacto
-            </Link>
 
-            {/* Dropdown de monedas en móvil */}
-            <div className="relative">
-              <button
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex items-center space-x-2 text-2xl hover:text-gray-800 transition-colors font-medium"
+            <div className="flex flex-col items-center space-y-8 w-full px-6">
+              <div className="w-24 h-24 mb-8">
+                <img src="/imagen.png" alt="Best Family Puppies Logo" className="w-full h-full object-contain" />
+              </div>
+
+              <Link
+                to="/"
+                className="text-2xl font-medium text-white hover:text-yellow-400 transition-colors w-full text-center py-4 border-b border-yellow-500/20 hover:border-yellow-400"
+                onClick={() => setIsMenuOpen(false)}
               >
-                <img 
-                  src={selectedCurrencyInfo.flag} 
-                  alt={selectedCurrencyInfo.name} 
-                  className="w-8 h-5 object-cover rounded"
-                />
-                <span>{selectedCurrencyInfo.code.toUpperCase()}</span>
-                <svg 
-                  className={`w-5 h-5 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
+                Inicio
+              </Link>
+              <Link
+                to="/catalogo"
+                className="text-2xl font-medium text-white hover:text-yellow-400 transition-colors w-full text-center py-4 border-b border-yellow-500/20 hover:border-yellow-400"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Perros
+              </Link>
+              <Link
+                to="/catalogo-gatos"
+                className="text-2xl font-medium text-white hover:text-yellow-400 transition-colors w-full text-center py-4 border-b border-yellow-500/20 hover:border-yellow-400"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Gatos
+              </Link>
+              <Link
+                to="/contacto"
+                className="text-2xl font-medium text-white hover:text-yellow-400 transition-colors w-full text-center py-4 border-b border-yellow-500/20 hover:border-yellow-400"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Contacto
+              </Link>
 
-              {isDropdownOpen && (
-                <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-48 bg-white rounded-lg shadow-xl py-2">
-                  {currencies.map((currency) => (
-                    <button
-                      key={currency.code}
-                      onClick={() => {
-                        setSelectedCurrency(currency.code);
-                        setIsDropdownOpen(false);
-                      }}
-                      className={`w-full px-4 py-2 text-left hover:bg-gray-100 flex items-center space-x-2 ${
-                        selectedCurrency === currency.code ? 'bg-yellow-100' : ''
-                      }`}
-                    >
-                      <img 
-                        src={currency.flag} 
-                        alt={currency.name} 
-                        className="w-6 h-4 object-cover rounded"
-                      />
-                      <span>{currency.name}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
+              {/* Dropdown de monedas en móvil */}
+              <div className="w-full">
+                <button
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="w-full flex items-center justify-center space-x-3 text-2xl text-white hover:text-yellow-400 transition-colors py-4 border-b border-yellow-500/20 hover:border-yellow-400"
+                >
+                  <img 
+                    src={selectedCurrencyInfo.flag} 
+                    alt={selectedCurrencyInfo.name} 
+                    className="w-8 h-5 object-cover rounded shadow-lg"
+                  />
+                  <span>{selectedCurrencyInfo.name}</span>
+                  <svg 
+                    className={`w-5 h-5 transition-transform ${isDropdownOpen ? 'rotate-180' : ''} text-yellow-400`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {isDropdownOpen && (
+                  <div className="mt-4 bg-gray-900/80 backdrop-blur-sm rounded-xl overflow-hidden border border-yellow-500/20">
+                    {currencies.map((currency) => (
+                      <button
+                        key={currency.code}
+                        onClick={() => {
+                          setSelectedCurrency(currency.code);
+                          setIsDropdownOpen(false);
+                        }}
+                        className={`w-full px-6 py-4 text-left hover:bg-yellow-500/10 flex items-center space-x-3 ${
+                          selectedCurrency === currency.code ? 'bg-yellow-500/10' : ''
+                        }`}
+                      >
+                        <img 
+                          src={currency.flag} 
+                          alt={currency.name} 
+                          className="w-8 h-5 object-cover rounded shadow-lg"
+                        />
+                        <span className="text-white text-lg">{currency.name}</span>
+                        {selectedCurrency === currency.code && (
+                          <svg className="w-5 h-5 text-yellow-400 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
