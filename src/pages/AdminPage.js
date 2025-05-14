@@ -113,7 +113,7 @@ const AdminPage = () => {
     setShowAddForm(false);
   };
 
-  const handleImageUpload = async (e, isEditing = false) => {
+  const handleImageUpload = async (e, isEditing = false, field = 'image') => {
     try {
       setUploadingImage(true);
       const file = e.target.files[0];
@@ -142,8 +142,8 @@ const AdminPage = () => {
       }
 
       // Primero intentamos eliminar la imagen anterior si existe
-      if (isEditing && editingPet.image) {
-        const oldImagePath = editingPet.image.split('/').pop();
+      if (isEditing && editingPet[field]) {
+        const oldImagePath = editingPet[field].split('/').pop();
         try {
           await supabase.storage
             .from(bucket)
@@ -172,9 +172,9 @@ const AdminPage = () => {
         .getPublicUrl(filePath);
 
       if (isEditing) {
-        setEditingPet({ ...editingPet, image: publicUrl });
+        setEditingPet({ ...editingPet, [field]: publicUrl });
       } else {
-        setNewPet({ ...newPet, image: publicUrl });
+        setNewPet({ ...newPet, [field]: publicUrl });
       }
     } catch (error) {
       console.error('Error uploading image:', error);
@@ -330,40 +330,51 @@ const AdminPage = () => {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="bg-gray-800 p-8 rounded-lg shadow-xl max-w-md w-full">
-          <h2 className="text-2xl font-bold text-yellow-400 mb-6 text-center">Panel de Administración</h2>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
-              <input
-                type="email"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                required
-                placeholder="admin@bestfamilypuppies.com"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Contraseña</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                required
-                placeholder="Puppies2025"
-              />
-            </div>
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-            <button
-              type="submit"
-              className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-medium py-2 px-4 rounded-lg transition-colors"
-            >
-              Iniciar Sesión
-            </button>
-          </form>
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center relative border-2 border-yellow-500"
+          style={{
+          backgroundImage: 'url(/golden-retriever.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}>
+        {/* Capa negra con opacidad */}
+        <div className="absolute inset-0 bg-black opacity-60 z-0"></div>
+        
+        {/* Contenido del panel */}
+        <div className="relative z-10">
+          <div className="bg-gray-800 p-8 rounded-lg shadow-xl max-w-md w-full">
+            <h2 className="text-2xl font-bold text-yellow-400 mb-6 text-center">Panel de Administración</h2>
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-white mb-1">Email</label>
+                <input
+                  type="email"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                  required
+                  placeholder="admin@bestfamilypuppies.com"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-white mb-1">Contraseña</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                  required
+                  placeholder="Puppies2025"
+                />
+              </div>
+              {error && <p className="text-red-500 text-sm">{error}</p>}
+              <button
+                type="submit"
+                className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-medium py-2 px-4 rounded-lg transition-colors"
+              >
+                Iniciar Sesión
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     );
@@ -431,7 +442,7 @@ const AdminPage = () => {
             <h3 className="text-xl font-bold text-white mb-4">Agregar Nuevo {activeTab === 'dogs' ? 'Perro' : 'Gato'}</h3>
             <form onSubmit={handleAddPet} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Nombre</label>
+                <label className="block text-sm font-medium text-white mb-1">Nombre</label>
                 <input
                   type="text"
                   value={newPet.name}
@@ -441,7 +452,7 @@ const AdminPage = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Tamaño</label>
+                <label className="block text-sm font-medium text-white mb-1">Tamaño</label>
                 <input
                   type="text"
                   value={newPet.size}
@@ -451,7 +462,7 @@ const AdminPage = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Características</label>
+                <label className="block text-sm font-medium text-white mb-1">Características</label>
                 <input
                   type="text"
                   value={newPet.characteristics}
@@ -461,7 +472,7 @@ const AdminPage = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Peso</label>
+                <label className="block text-sm font-medium text-white mb-1">Peso</label>
                 <input
                   type="text"
                   value={newPet.weight}
@@ -500,30 +511,23 @@ const AdminPage = () => {
                   required
                 />
               </div>
-              <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-300 mb-1">Imagen</label>
-                <div className="flex items-center space-x-4">
-                  {newPet.image && (
-                    <img src={newPet.image} alt="Preview" className="w-20 h-20 object-cover rounded-lg" />
-                  )}
-                  <div className="flex-1">
+              <div className="col-span-2 grid grid-cols-2 gap-4 mb-4">
+                {["image_1", "image_2", "image_3", "image_4", "father_image", "mother_image"].map((field) => (
+                  <div key={field} className="flex flex-col items-center">
+                    <span className="text-xs text-gray-400 mb-1">{field.replace('_', ' ').replace('image', 'Foto').replace('father', 'Padre').replace('mother', 'Madre').replace('  ', ' ')}</span>
+                    {newPet[field] ? (
+                      <img src={newPet[field]} alt={field} className="w-24 h-24 object-cover rounded-lg border-2 border-yellow-500 mb-2" />
+                    ) : (
+                      <div className="w-24 h-24 flex items-center justify-center bg-gray-700 rounded-lg border-2 border-gray-600 text-gray-400 mb-2">Sin imagen</div>
+                    )}
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={(e) => handleImageUpload(e)}
-                      className="hidden"
-                      ref={fileInputRef}
+                      onChange={(e) => handleImageUpload(e, false, field)}
+                      className="mb-2"
                     />
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="w-full bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-                      disabled={uploadingImage}
-                    >
-                      {uploadingImage ? 'Subiendo...' : 'Seleccionar Imagen'}
-                    </button>
                   </div>
-                </div>
+                ))}
               </div>
               <div className="col-span-2 flex justify-end space-x-4">
                 <button
@@ -551,154 +555,244 @@ const AdminPage = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPets.map((pet) => (
-              <div key={pet.id} className="bg-gray-800 p-4 rounded-lg">
-                {editingPet?.id === pet.id ? (
-                  <form onSubmit={handleUpdatePet} className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1">Nombre</label>
-                      <input
-                        type="text"
-                        value={editingPet.name}
-                        onChange={(e) => setEditingPet({ ...editingPet, name: e.target.value })}
-                        className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1">Tamaño</label>
-                      <input
-                        type="text"
-                        value={editingPet.size}
-                        onChange={(e) => setEditingPet({ ...editingPet, size: e.target.value })}
-                        className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1">Características</label>
-                      <input
-                        type="text"
-                        value={editingPet.characteristics}
-                        onChange={(e) => setEditingPet({ ...editingPet, characteristics: e.target.value })}
-                        className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1">Peso</label>
-                      <input
-                        type="text"
-                        value={editingPet.weight}
-                        onChange={(e) => setEditingPet({ ...editingPet, weight: e.target.value })}
-                        className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1">Altura</label>
-                      <input
-                        type="text"
-                        value={editingPet.height}
-                        onChange={(e) => setEditingPet({ ...editingPet, height: e.target.value })}
-                        className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1">Camadas</label>
-                      <input
-                        type="text"
-                        value={editingPet.litters}
-                        onChange={(e) => setEditingPet({ ...editingPet, litters: e.target.value })}
-                        className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1">Precio (USD)</label>
-                      <input
-                        type="number"
-                        value={editingPet.price}
-                        onChange={(e) => setEditingPet({ ...editingPet, price: e.target.value })}
-                        className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1">Imagen</label>
-                      <div className="flex items-center space-x-4">
-                        {editingPet.image && (
-                          <img src={editingPet.image} alt="Preview" className="w-20 h-20 object-cover rounded-lg" />
-                        )}
-                        <div className="flex-1">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleImageUpload(e, true)}
-                            className="hidden"
-                            ref={fileInputRef}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => fileInputRef.current?.click()}
-                            className="w-full bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-                            disabled={uploadingImage}
-                          >
-                            {uploadingImage ? 'Subiendo...' : 'Cambiar Imagen'}
-                          </button>
-                        </div>
+              <div key={pet.id} className="bg-gray-900 border border-yellow-200 rounded-2xl shadow-lg mb-8 overflow-hidden transition-all duration-500 p-0 md:p-4 flex flex-col">
+                {/* Imagen principal y miniaturas */}
+                <div className="flex flex-col items-center md:w-full bg-gray-100 py-4 px-2">
+                  <div className="w-40 h-40 rounded-xl overflow-hidden shadow border-2 border-yellow-400 mb-4 bg-gray-900 flex items-center justify-center">
+                    {pet.image_1 ? (
+                      <img src={pet.image_1} alt={pet.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-gray-400">Sin imagen</span>
+                    )}
+                  </div>
+                  <div className="flex gap-2 mb-2">
+                    {["image_2", "image_3", "image_4"].map((field) => (
+                      pet[field] ? (
+                        <img key={field} src={pet[field]} alt={field} className="w-12 h-12 object-cover rounded-lg border border-yellow-300 bg-gray-900" />
+                      ) : null
+                    ))}
+                  </div>
+                  <div className="flex gap-4 mt-2">
+                    {pet.father_image && (
+                      <div className="flex flex-col items-center">
+                        <img src={pet.father_image} alt="Padre" className="w-10 h-10 object-cover rounded-full border-2 border-blue-300" />
+                        <span className="text-xs text-blue-400 mt-1">Padre</span>
                       </div>
-                    </div>
-                    <div className="flex justify-end space-x-4">
-                      <button
-                        type="button"
-                        onClick={() => setEditingPet(null)}
-                        className="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-                      >
-                        Cancelar
-                      </button>
-                      <button
-                        type="submit"
-                        className="bg-yellow-500 hover:bg-yellow-600 text-black font-medium py-2 px-4 rounded-lg transition-colors"
-                      >
-                        Guardar
-                      </button>
-                    </div>
-                  </form>
-                ) : (
-                  <>
-                    <div className="aspect-w-16 aspect-h-9 mb-4">
-                      <img src={pet.image} alt={pet.name} className="w-full h-full object-cover rounded-lg" />
-                    </div>
-                    <h3 className="text-lg font-bold text-white mb-2">{pet.name}</h3>
-                    <p className="text-gray-300 text-sm mb-2">{pet.characteristics}</p>
-                    <div className="grid grid-cols-2 gap-2 text-sm text-gray-400 mb-4">
-                      <div>Peso: {pet.weight}</div>
-                      <div>Altura: {pet.height}</div>
-                      <div>Camadas: {pet.litters}</div>
-                      <div>Precio: ${pet.price} USD</div>
-                    </div>
-                    <div className="flex space-x-4">
-                      <button
-                        onClick={() => handleEdit(pet)}
-                        className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-black font-medium py-2 px-4 rounded-lg transition-colors"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => handleDeletePet(pet.id)}
-                        disabled={loading}
-                        className={`flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors ${
-                          loading ? 'opacity-50 cursor-not-allowed' : ''
-                        }`}
-                      >
-                        {loading ? 'Eliminando...' : 'Eliminar'}
-                      </button>
-                    </div>
-                  </>
-                )}
+                    )}
+                    {pet.mother_image && (
+                      <div className="flex flex-col items-center">
+                        <img src={pet.mother_image} alt="Madre" className="w-10 h-10 object-cover rounded-full border-2 border-pink-300" />
+                        <span className="text-xs text-pink-400 mt-1">Madre</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {/* Datos y botones */}
+                <div className="flex-1 flex flex-col justify-between bg-gray-900 p-4">
+                <div className="flex flex-col items-center mb-4">
+                  <h3 className="text-2xl font-bold text-yellow-500 mb-2 font-size-10">{pet.name}</h3>
+                </div>
+                  {/* Rediseño de datos clave de la mascota */}
+                  <ul className="w-full mb-4 grid grid-cols-2 gap-2 text-sm">
+                    <li className="flex items-center gap-2 bg-gray-800 rounded-lg p-2 col-span-2">
+                      <span className="font-semibold text-white">Características:</span>
+                      <span className="text-white">{pet.characteristics}</span>
+                    </li>
+                    <li className="flex items-center gap-2 bg-gray-800 rounded-lg p-2">
+                      <span className="font-semibold text-white">Tamaño:</span>
+                      <span className="text-yellow-400">{pet.size}</span>
+                    </li>
+                    <li className="flex items-center gap-2 bg-gray-800 rounded-lg p-2">
+                      <span className="font-semibold text-white">Peso:</span>
+                      <span className="text-blue-300">{pet.weight}</span>
+                    </li>
+                    <li className="flex items-center gap-2 bg-gray-800 rounded-lg p-2">
+                      <span className="font-semibold text-white">Altura:</span>
+                      <span className="text-blue-300">{pet.height}</span>
+                    </li>
+                    <li className="flex items-center gap-2 bg-gray-800 rounded-lg p-2">
+                      <span className="font-semibold text-white">Camadas:</span>
+                      <span className="text-pink-300">{pet.litters}</span>
+                    </li>
+                  </ul>
+                  <div className="w-full flex justify-end mb-4">
+                    <span className="text-2xl font-bold text-yellow-400">${pet.price} USD</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEdit(pet)}
+                      className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-2 px-6 rounded-lg shadow transition-colors"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => handleDeletePet(pet.id)}
+                      disabled={loading}
+                      className={`bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition-colors ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                      {loading ? 'Eliminando...' : 'Eliminar'}
+                    </button>
+                  </div>
+                </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Modal de edición */}
+        {editingPet && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
+            <div className="relative bg-gray-900 rounded-2xl shadow-2xl w-full max-w-3xl mx-auto p-8 overflow-y-auto max-h-[90vh] animate-fade-in border-2 border-white/20">
+              <button
+                className="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-2xl font-bold"
+                onClick={() => setEditingPet(null)}
+                aria-label="Cerrar"
+              >
+                ×
+              </button>
+              <form onSubmit={handleUpdatePet} className="w-full bg-gray-900">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                  {/* Galería editable */}
+                  <div>
+                    <h4 className="text-lg font-bold text-yellow-500 mb-4">Imágenes del cachorro</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      {["image_1", "image_2", "image_3", "image_4", "image_5", "image_6"].map((field) => (
+                        <div key={field} className="flex flex-col items-center">
+                          <span className="text-xs text-gray-400 mb-1">{field.replace('_', ' ').replace('image', 'Foto')}</span>
+                          {editingPet[field] ? (
+                            <img src={editingPet[field]} alt={field} className="w-20 h-20 object-cover rounded-lg border-2 border-yellow-500 mb-2" />
+                          ) : (
+                            <div className="w-20 h-20 flex items-center justify-center bg-gray-200 rounded-lg border-2 border-gray-300 text-gray-400 mb-2">Sin imagen</div>
+                          )}
+                          <label className="w-full">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleImageUpload(e, true, field)}
+                              className="hidden"
+                            />
+                            <span className="block w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-2 px-2 rounded-lg text-center cursor-pointer transition-colors text-sm">Cambiar</span>
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                    <h4 className="text-lg font-bold text-yellow-500 mt-8 mb-4">Fotos de los padres</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      {["image_father_1", "image_father_2", "image_mother_1", "image_mother_2"].map((field) => (
+                        <div key={field} className="flex flex-col items-center">
+                          <span className={`text-xs mb-1 ${field.includes('father') ? 'text-blue-400' : 'text-pink-400'}`}>{field.includes('father') ? 'Padre' : 'Madre'}</span>
+                          {editingPet[field] ? (
+                            <img src={editingPet[field]} alt={field} className="w-20 h-20 object-cover rounded-full border-2 mb-2 border-blue-300" />
+                          ) : (
+                            <div className="w-20 h-20 flex items-center justify-center bg-gray-200 rounded-full border-2 border-gray-300 text-gray-400 mb-2">Sin imagen</div>
+                          )}
+                          <label className="w-full">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleImageUpload(e, true, field)}
+                              className="hidden"
+                            />
+                            <span className="block w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-2 px-2 rounded-lg text-center cursor-pointer transition-colors text-sm">Cambiar</span>
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  {/* Datos generales */}
+                  <div>
+                    <h4 className="text-lg font-bold text-yellow-500 mb-4">Datos generales</h4>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-white mb-1">Nombre</label>
+                        <input
+                          type="text"
+                          value={editingPet.name}
+                          onChange={(e) => setEditingPet({ ...editingPet, name: e.target.value })}
+                          className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-white mb-1">Tamaño</label>
+                        <input
+                          type="text"
+                          value={editingPet.size}
+                          onChange={(e) => setEditingPet({ ...editingPet, size: e.target.value })}
+                          className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-white mb-1">Características</label>
+                        <input
+                          type="text"
+                          value={editingPet.characteristics}
+                          onChange={(e) => setEditingPet({ ...editingPet, characteristics: e.target.value })}
+                          className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-white mb-1">Peso</label>
+                        <input
+                          type="text"
+                          value={editingPet.weight}
+                          onChange={(e) => setEditingPet({ ...editingPet, weight: e.target.value })}
+                          className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium white mb-1">Altura</label>
+                        <input
+                          type="text"
+                          value={editingPet.height}
+                          onChange={(e) => setEditingPet({ ...editingPet, height: e.target.value })}
+                          className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium white mb-1">Camadas</label>
+                        <input
+                          type="text"
+                          value={editingPet.litters}
+                          onChange={(e) => setEditingPet({ ...editingPet, litters: e.target.value })}
+                          className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium white mb-1">Precio (USD)</label>
+                        <input
+                          type="number"
+                          value={editingPet.price}
+                          onChange={(e) => setEditingPet({ ...editingPet, price: e.target.value })}
+                          className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-end gap-4 mt-8 border-t pt-6">
+                  <button
+                    type="button"
+                    onClick={() => setEditingPet(null)}
+                    className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-8 rounded-lg transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-2 px-8 rounded-lg transition-colors"
+                  >
+                    Guardar
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         )}
       </div>
