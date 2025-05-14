@@ -119,32 +119,28 @@ function PaymentPage() {
           <div className="space-y-4">
             <div className="bg-gray-800 rounded-lg overflow-hidden">
               <img
-                src={dog?.image_1 || cat?.image_1}
-                alt={dog?.name || cat?.name}
+                src={images[currentImageIndex]}
+                alt={pet.name}
                 className="w-full aspect-h-10 object-cover"
               />
             </div>
             
             <div className="grid grid-cols-4 gap-1">
-              {[1, 2, 3, 4].map((num) => {
-                const image = dog?.[`image_${num}`] || cat?.[`image_${num}`];
-                if (!image) return null;
-                return (
-                  <button
-                    key={num}
-                    onClick={() => setCurrentImageIndex(num - 1)}
-                    className={`relative aspect-square rounded-lg overflow-hidden ${
-                      currentImageIndex === num - 1 ? 'ring-2 ring-yellow-400' : ''
-                    }`}
-                  >
-                    <img
-                      src={image}
-                      alt={`${dog?.name || cat?.name} ${num}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                );
-              })}
+              {images.map((image, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentImageIndex(index)}
+                  className={`relative aspect-square rounded-lg overflow-hidden ${
+                    currentImageIndex === index ? 'ring-2 ring-yellow-400' : ''
+                  }`}
+                >
+                  <img
+                    src={image}
+                    alt={`${pet.name} ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
             </div>
 
             {/* Add DeliveryConditions component here */}

@@ -21,7 +21,7 @@ const Hero = () => {
                 to="/catalogo" 
                 className="bg-white hover:bg-yellow-500 text-black font-medium py-3 px-6 rounded-lg shadow-md transition-all transform hover:scale-105 text-center"
               >
-                Ver catálogo
+                Ver Cachorros
               </Link>
             </div>
           </div>
