@@ -9,31 +9,63 @@ import { Link } from 'react-router-dom';
 const testimonials = [
   {
     id: 1,
-    name: "María Rodríguez",
-    location: "Costa Rica",
-    image: "/test1.png",
-    text: "¡Increíble experiencia! Mi cachorro llegó en perfectas condiciones y es exactamente como lo vi en las fotos. El proceso de adopción fue muy profesional.",
+    name: "Familia Hall",
+    location: "Newfoundland",
+    pet: "Gatito Sphynx",
+    text: "He instantly bonded with our youngest — they're inseparable now.",
     rating: 5,
-    date: "15 Enero 2024"
+    date: "15 Enero 2024",
+    petImage: "/Sphynx.png"
   },
   {
     id: 2,
-    name: "John Smith",
-    location: "Estados Unidos",
-    image: "/test2.png",
-    text: "Best Family Puppies hizo que el proceso de adopción fuera muy fácil. Mi nuevo compañero es adorable y está perfectamente entrenado. ¡Altamente recomendado!",
+    name: "Familia Lambert",
+    location: "Quebec",
+    pet: "Gatito Maine Coon",
+    text: "Every little purr is like music at home. We adore her.",
     rating: 5,
-    date: "10 Mayo 2024"
+    date: "10 Mayo 2024",
+    petImage: "/Maine-Coon.png"
   },
-  
   {
     id: 3,
-    name: "Carlos Méndez",
-    location: "Nicaragua",
-    image: "/test3.png",
-    text: "El servicio de entrega fue impecable. Mi cachorro llegó en perfecto estado y muy bien cuidado. La comunicación durante todo el proceso fue excelente.",
+    name: "Familia McNeil",
+    location: "Alberta",
+    pet: "Perrito Golden Retriever",
+    text: "Thanks to you, we found not just a pet but a lifelong friend.",
     rating: 5,
-    date: "1 Abril 2025"
+    date: "1 Abril 2024",
+    petImage: "/golden.png"
+  },
+  {
+    id: 4,
+    name: "Familia Deschamps",
+    location: "Quebec",
+    pet: "Gatito Ragdoll",
+    text: "Thanks to you, we found not just a pet but a lifelong friend.",
+    rating: 5,
+    date: "5 Marzo 2024",
+    petImage: "Ragdoll.png"
+  },
+  {
+    id: 5,
+    name: "Familia Palmer",
+    location: "Houston",
+    pet: "Perrito Shih Tzu",
+    text: "We were surprised at how well-trained and loving he was from day one.",
+    rating: 5,
+    date: "20 Marzo 2024",
+    petImage: "shitzu.png"
+  },
+  {
+    id: 6,
+    name: "Familia Ross",
+    location: "Alberta",
+    pet: "Perrito Pomeranian",
+    text: "They have filled our home with joy and light.",
+    rating: 5,
+    date: "1 Noviembre 2024",
+    petImage: "Pomeranian.png"
   }
 ];
 
@@ -96,24 +128,20 @@ const Home = () => {
                 key={testimonial.id}
                 className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300 hover:transform hover:scale-105"
               >
-                <div className="flex items-center mb-6">
-                  <div className="relative">
-                    <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-yellow-500">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-white">{testimonial.name}</h3>
+                    <p className="text-gray-400 text-sm">{testimonial.location}</p>
+                    <p className="text-yellow-400 text-sm mt-1">{testimonial.pet}</p>
+                  </div>
+                  <div className="ml-4 flex-shrink-0">
+                    <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-yellow-500">
                       <img 
-                        src={testimonial.image} 
-                        alt={testimonial.name}
+                        src={testimonial.petImage} 
+                        alt={testimonial.pet}
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <div className="absolute -bottom-2 -right-2 bg-yellow-500 rounded-full p-1">
-                      <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="ml-4">
-                    <h3 className="text-lg font-semibold text-white">{testimonial.name}</h3>
-                    <p className="text-gray-400 text-sm">{testimonial.location}</p>
                   </div>
                 </div>
 
