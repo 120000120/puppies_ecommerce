@@ -5,6 +5,7 @@ import CallToAction from '../components/CallToAction';
 import DogCard from '../components/DogCard';
 import { supabase } from '../lib/supabase';
 import { Link } from 'react-router-dom';
+import { useCurrency } from '../context/CurrencyContext';
 
 const testimonials = [
   {
@@ -73,6 +74,9 @@ const Home = () => {
   const [randomDogs, setRandomDogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { selectedCurrency } = useCurrency();
+
+  const isEnglish = selectedCurrency === 'usd' || selectedCurrency === 'cad';
 
   useEffect(() => {
     fetchRandomDogs();
@@ -116,9 +120,13 @@ const Home = () => {
 
         <div className="container mx-auto px-4 relative">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-yellow-400 mb-4">Lo Que Dicen Nuestros Clientes</h2>
+            <h2 className="text-4xl font-bold text-yellow-400 mb-4">
+              {isEnglish ? 'What Our Clients Say' : 'Lo Que Dicen Nuestros Clientes'}
+            </h2>
             <p className="text-gray-300 max-w-2xl mx-auto text-lg">
-              Experiencias reales de familias que han encontrado a su compañero perfecto con nosotros
+              {isEnglish
+                ? 'Real experiences from families who have found their perfect companion with us.'
+                : 'Experiencias reales de familias que han encontrado a su compañero perfecto con nosotros'}
             </p>
           </div>
 
@@ -169,7 +177,7 @@ const Home = () => {
               to="/catalogo"
               className="inline-flex items-center px-6 py-3 bg-yellow-500 text-black font-semibold rounded-lg hover:bg-yellow-600 transition-colors duration-300"
             >
-              Ver cachorritos
+              {isEnglish ? 'See Puppies' : 'Ver cachorritos'}
               <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
@@ -187,9 +195,13 @@ const Home = () => {
       <section className="py-16 bg-gray-black text-white ">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-yellow-400 mb-4">Nuestros Cachorros</h2>
+            <h2 className="text-3xl font-bold text-yellow-400 mb-4">
+              {isEnglish ? 'Our Puppies' : 'Nuestros Cachorros'}
+            </h2>
             <p className="text-gray-300 max-w-2xl mx-auto">
-              Explora nuestra amplia selección de cachorros disponibles para encontrar tu compañero perfecto.
+              {isEnglish
+                ? 'Explore our wide selection of available puppies to find your perfect companion.'
+                : 'Explora nuestra amplia selección de cachorros disponibles para encontrar tu compañero perfecto.'}
             </p>
           </div>
           
