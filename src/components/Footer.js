@@ -54,6 +54,11 @@ const Footer = () => {
                   Contacto
                 </Link>
               </li>
+              <li>
+                <Link to="/admin" className="text-gray-400 hover:text-yellow-400 transition-colors">
+                  Panel de Admin
+                </Link>
+              </li>
             </ul>
           </div>
 
