@@ -108,7 +108,13 @@ const Home = () => {
 
   return (
     <main>
-      <Hero />
+      <Hero
+        title={isEnglish ? 'Find Your Perfect Companion' : 'Encuentra a tu compañero perfecto'}
+        subtitle={isEnglish
+          ? 'At Best Family Puppies, we offer a wide variety of high-quality dog breeds so you can find the ideal puppy for your family.'
+          : 'En Best Family Puppies ofrecemos una amplia variedad de razas de perros de alta calidad para que encuentres el cachorro ideal para tu familia.'}
+        buttonText={isEnglish ? 'See Puppies' : 'Ver Cachorros'}
+      />
 
       {/* Testimonials Section */}
       <section className="py-20 bg-gradient-to-b from-gray-900 to-black relative overflow-hidden">

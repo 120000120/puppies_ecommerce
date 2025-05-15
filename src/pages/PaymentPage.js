@@ -111,6 +111,24 @@ function PaymentPage() {
   const pet = dog || cat;
   const price = getPriceByCurrency(pet);
 
+  const allCurrencies = [
+    { code: 'usd', label: 'USD', locale: 'en-US' },
+    { code: 'cad', label: 'CAD', locale: 'en-CA' },
+    { code: 'crc', label: 'CRC', locale: 'es-CR' },
+    { code: 'nio', label: 'NIO', locale: 'es-NI' },
+    { code: 'pab', label: 'PAB', locale: 'es-PA' }
+  ];
+
+  const getPriceForCurrency = (pet, code) => {
+    if (!pet) return 0;
+    if (code === 'usd') return pet.price;
+    if (code === 'cad') return pet.price_canada;
+    if (code === 'crc') return pet.price_costa_rica;
+    if (code === 'nio') return pet.price_nicaragua;
+    if (code === 'pab') return pet.price_panama;
+    return pet.price;
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-white py-12">
       <div className="container mx-auto px-4 max-w-6xl">
@@ -220,6 +238,18 @@ function PaymentPage() {
                       }).format(price)}
                     </span>
                   </div>
+                </div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {allCurrencies.map((cur) => (
+                    <span key={cur.code} className="text-xs bg-gray-800 text-yellow-300 px-2 py-1 rounded">
+                      {new Intl.NumberFormat(cur.locale, {
+                        style: 'currency',
+                        currency: cur.label,
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                      }).format(getPriceForCurrency(pet, cur.code))} {cur.label}
+                    </span>
+                  ))}
                 </div>
               </div>
             </div>

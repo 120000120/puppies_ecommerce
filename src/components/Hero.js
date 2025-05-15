@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { featuredDogs } from '../mock/dogs';
 
-const Hero = () => {
+const Hero = ({ title, subtitle, buttonText }) => {
   return (
     <div className="relative bg-black text-white min-h-screen flex items-center">
       <div className="container mx-auto px-4 py-16 md:py-24 w-full">
@@ -10,18 +10,17 @@ const Hero = () => {
           <div className="md:w-1/2 mb-10 md:mb-0 md:pr-10">
             
             <h1 className="text-4xl md:text-5xl font-bold text-yellow-400 mb-4">
-              Encuentra a tu compañero perfecto
+              {title}
             </h1>
             <p className="text-lg text-gray-300 mb-8">
-              En Best Family Puppies ofrecemos una amplia variedad de razas de perros 
-              de alta calidad para que encuentres el cachorro ideal para tu familia.
+              {subtitle}
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link 
                 to="/catalogo" 
                 className="bg-white hover:bg-yellow-500 text-black font-medium py-3 px-6 rounded-lg shadow-md transition-all transform hover:scale-105 text-center"
               >
-                Ver Cachorros
+                {buttonText}
               </Link>
             </div>
           </div>
