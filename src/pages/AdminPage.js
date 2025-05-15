@@ -218,11 +218,16 @@ const AdminPage = () => {
     e.preventDefault();
     try {
       const table = activeTab === 'dogs' ? 'dogs' : 'cats';
+      const { image, ...petData } = newPet;
+      petData.litters = parseInt(petData.litters, 10) || 0;
       const { error } = await supabase
         .from(table)
-        .insert([newPet]);
+        .insert([petData]);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error adding pet:', error);
+        console.error('Full error object:', JSON.stringify(error, null, 2));
+      }
       
       setShowAddForm(false);
       setNewPet({
@@ -341,39 +346,39 @@ const AdminPage = () => {
         
         {/* Contenido del panel */}
         <div className="relative z-10">
-          <div className="bg-gray-800 p-8 rounded-lg shadow-xl max-w-md w-full">
-            <h2 className="text-2xl font-bold text-yellow-400 mb-6 text-center">Panel de Administración</h2>
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div>
+        <div className="bg-gray-800 p-8 rounded-lg shadow-xl max-w-md w-full">
+          <h2 className="text-2xl font-bold text-yellow-400 mb-6 text-center">Panel de Administración</h2>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
                 <label className="block text-sm font-medium text-white mb-1">Email</label>
-                <input
-                  type="email"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                  required
-                  placeholder="admin@bestfamilypuppies.com"
-                />
-              </div>
-              <div>
+              <input
+                type="email"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                required
+                  placeholder="email"
+              />
+            </div>
+            <div>
                 <label className="block text-sm font-medium text-white mb-1">Contraseña</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                  required
-                  placeholder="Puppies2025"
-                />
-              </div>
-              {error && <p className="text-red-500 text-sm">{error}</p>}
-              <button
-                type="submit"
-                className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-medium py-2 px-4 rounded-lg transition-colors"
-              >
-                Iniciar Sesión
-              </button>
-            </form>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                required
+                  placeholder="contraseña"
+              />
+            </div>
+            {error && <p className="text-red-500 text-sm">{error}</p>}
+            <button
+              type="submit"
+              className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-medium py-2 px-4 rounded-lg transition-colors"
+            >
+              Iniciar Sesión
+            </button>
+          </form>
           </div>
         </div>
       </div>
@@ -703,96 +708,96 @@ const AdminPage = () => {
                   <div>
                     <h4 className="text-lg font-bold text-yellow-500 mb-4">Datos generales</h4>
                     <div className="space-y-4">
-                      <div>
+                    <div>
                         <label className="block text-sm font-medium text-white mb-1">Nombre</label>
-                        <input
-                          type="text"
-                          value={editingPet.name}
-                          onChange={(e) => setEditingPet({ ...editingPet, name: e.target.value })}
+                      <input
+                        type="text"
+                        value={editingPet.name}
+                        onChange={(e) => setEditingPet({ ...editingPet, name: e.target.value })}
                           className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
-                          required
-                        />
-                      </div>
-                      <div>
+                        required
+                      />
+                    </div>
+                    <div>
                         <label className="block text-sm font-medium text-white mb-1">Tamaño</label>
-                        <input
-                          type="text"
-                          value={editingPet.size}
-                          onChange={(e) => setEditingPet({ ...editingPet, size: e.target.value })}
+                      <input
+                        type="text"
+                        value={editingPet.size}
+                        onChange={(e) => setEditingPet({ ...editingPet, size: e.target.value })}
                           className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
-                          required
-                        />
-                      </div>
-                      <div>
+                        required
+                      />
+                    </div>
+                    <div>
                         <label className="block text-sm font-medium text-white mb-1">Características</label>
-                        <input
-                          type="text"
-                          value={editingPet.characteristics}
-                          onChange={(e) => setEditingPet({ ...editingPet, characteristics: e.target.value })}
+                      <input
+                        type="text"
+                        value={editingPet.characteristics}
+                        onChange={(e) => setEditingPet({ ...editingPet, characteristics: e.target.value })}
                           className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
-                          required
-                        />
-                      </div>
-                      <div>
+                        required
+                      />
+                    </div>
+                    <div>
                         <label className="block text-sm font-medium text-white mb-1">Peso</label>
-                        <input
-                          type="text"
-                          value={editingPet.weight}
-                          onChange={(e) => setEditingPet({ ...editingPet, weight: e.target.value })}
+                      <input
+                        type="text"
+                        value={editingPet.weight}
+                        onChange={(e) => setEditingPet({ ...editingPet, weight: e.target.value })}
                           className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
-                          required
-                        />
-                      </div>
-                      <div>
+                        required
+                      />
+                    </div>
+                    <div>
                         <label className="block text-sm font-medium white mb-1">Altura</label>
-                        <input
-                          type="text"
-                          value={editingPet.height}
-                          onChange={(e) => setEditingPet({ ...editingPet, height: e.target.value })}
+                      <input
+                        type="text"
+                        value={editingPet.height}
+                        onChange={(e) => setEditingPet({ ...editingPet, height: e.target.value })}
                           className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
-                          required
-                        />
-                      </div>
-                      <div>
+                        required
+                      />
+                    </div>
+                    <div>
                         <label className="block text-sm font-medium white mb-1">Camadas</label>
-                        <input
-                          type="text"
-                          value={editingPet.litters}
-                          onChange={(e) => setEditingPet({ ...editingPet, litters: e.target.value })}
+                      <input
+                        type="text"
+                        value={editingPet.litters}
+                        onChange={(e) => setEditingPet({ ...editingPet, litters: e.target.value })}
                           className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
-                          required
-                        />
-                      </div>
-                      <div>
+                        required
+                      />
+                    </div>
+                    <div>
                         <label className="block text-sm font-medium white mb-1">Precio (USD)</label>
-                        <input
-                          type="number"
-                          value={editingPet.price}
-                          onChange={(e) => setEditingPet({ ...editingPet, price: e.target.value })}
+                      <input
+                        type="number"
+                        value={editingPet.price}
+                        onChange={(e) => setEditingPet({ ...editingPet, price: e.target.value })}
                           className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
-                          required
-                        />
+                        required
+                      />
                       </div>
                     </div>
                   </div>
                 </div>
                 <div className="flex justify-end gap-4 mt-8 border-t pt-6">
-                  <button
-                    type="button"
-                    onClick={() => setEditingPet(null)}
+                      <button
+                        type="button"
+                        onClick={() => setEditingPet(null)}
                     className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-8 rounded-lg transition-colors"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="submit"
                     className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-2 px-8 rounded-lg transition-colors"
-                  >
-                    Guardar
-                  </button>
-                </div>
-              </form>
-            </div>
+                      >
+                        Guardar
+                      </button>
+                    </div>
+                  </form>
+              </div>
           </div>
         )}
       </div>

@@ -16,6 +16,7 @@ const AdminPanel = ({ onLogout }) => {
     price: '',
     image: ''
   });
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
     fetchPets();
@@ -80,6 +81,58 @@ const AdminPanel = ({ onLogout }) => {
       } catch (error) {
         console.error('Error deleting pet:', error);
       }
+    }
+  };
+
+  const handleImageUpload = async (e) => {
+    try {
+      setUploadingImage(true);
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        alert('Por favor, selecciona un archivo de imagen válido.');
+        return;
+      }
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const bucket = activeTab === 'dogs' ? 'perrosimagenes' : 'gatosimagenes';
+      const filePath = `${fileName}`;
+
+      const { data: bucketData, error: bucketError } = await supabase.storage
+        .from(bucket)
+        .list();
+
+      if (bucketError) {
+        console.error('Error accessing bucket:', bucketError);
+        alert('Error al acceder al almacenamiento. Por favor, verifica los permisos del bucket.');
+        return;
+      }
+
+      const { error: uploadError } = await supabase.storage
+        .from(bucket)
+        .upload(filePath, file, { 
+          upsert: true,
+          cacheControl: '3600',
+          contentType: file.type
+        });
+
+      if (uploadError) {
+        console.error('Upload error details:', uploadError);
+        throw uploadError;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from(bucket)
+        .getPublicUrl(filePath);
+
+      setNewPet({ ...newPet, image: publicUrl });
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Error al subir la imagen. Por favor, verifica que:\n1. El bucket existe\n2. Tienes los permisos correctos\n3. El archivo es una imagen válida');
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -197,14 +250,22 @@ const AdminPanel = ({ onLogout }) => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">URL de la imagen</label>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Imagen</label>
                 <input
-                  type="text"
-                  value={newPet.image}
-                  onChange={(e) => setNewPet({ ...newPet, image: e.target.value })}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
                   className="w-full px-4 py-2 bg-gray-600 border border-gray-500 rounded-lg text-white"
                   required
                 />
+                {uploadingImage && (
+                  <div className="mt-2 text-center">
+                    <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-yellow-500 mx-auto"></div>
+                  </div>
+                )}
+                {newPet.image && (
+                  <img src={newPet.image} alt="Preview" className="mt-2 w-24 h-24 object-cover rounded-lg border-2 border-yellow-500" />
+                )}
               </div>
               <div className="col-span-2 flex justify-end space-x-4">
                 <button
