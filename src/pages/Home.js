@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Hero from '../components/Hero';
+import VideoSection from '../components/VideoSection';
 import WhyChooseUs from '../components/WhyChooseUs';
 import CallToAction from '../components/CallToAction';
 import DogCard from '../components/DogCard';
@@ -116,6 +117,8 @@ const Home = () => {
         buttonText={isEnglish ? 'See Puppies' : 'Ver Cachorros'}
       />
 
+      <WhyChooseUs />
+
       {/* Testimonials Section */}
       <section className="py-20 bg-gradient-to-b from-gray-900 to-black relative overflow-hidden">
         {/* Background decorative elements */}
@@ -196,6 +199,7 @@ const Home = () => {
         </svg>
       </div> */}
       </section>
+      <VideoSection />
       
       {/* Random Dogs Section */}
       <section className="py-16 bg-gray-black text-white ">
@@ -237,7 +241,7 @@ const Home = () => {
         </div>
       </section>
 
-      <WhyChooseUs />
+      
       <CallToAction />
     </main>
   );
