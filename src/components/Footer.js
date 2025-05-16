@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import AdminLogin from './AdminLogin';
 import AdminPanel from './AdminPanel';
 
 const Footer = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = () => {
     setIsLoggedIn(true);
@@ -16,13 +17,18 @@ const Footer = () => {
     setIsLoggedIn(false);
   };
 
+  const handleNavigation = (path) => {
+    navigate(path);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <footer className="bg-gray-800 text-white py-8">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Logo y descripción */}
           <div className="space-y-4">
-            <Link to="/" className="inline-block">
+            <Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="inline-block">
               <img 
                 src="/imagen.png" 
                 alt="Best Family Puppies" 
@@ -40,24 +46,36 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4 text-yellow-400">Enlaces Rápidos</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/catalogo" className="text-gray-400 hover:text-yellow-400 transition-colors">
+                <button 
+                  onClick={() => handleNavigation('/catalogo')} 
+                  className="text-gray-400 hover:text-yellow-400 transition-colors"
+                >
                   Catálogo de Perros
-                </Link>
+                </button>
               </li>
               <li>
-                <Link to="/catalogo-gatos" className="text-gray-400 hover:text-yellow-400 transition-colors">
+                <button 
+                  onClick={() => handleNavigation('/catalogo-gatos')} 
+                  className="text-gray-400 hover:text-yellow-400 transition-colors"
+                >
                   Catálogo de Gatos
-                </Link>
+                </button>
               </li>
               <li>
-                <Link to="/contact" className="text-gray-400 hover:text-yellow-400 transition-colors">
+                <button 
+                  onClick={() => handleNavigation('/contacto')} 
+                  className="text-gray-400 hover:text-yellow-400 transition-colors"
+                >
                   Contacto
-                </Link>
+                </button>
               </li>
               <li>
-                <Link to="/admin" className="text-gray-400 hover:text-yellow-400 transition-colors">
+                <button 
+                  onClick={() => handleNavigation('/admin')} 
+                  className="text-gray-400 hover:text-yellow-400 transition-colors"
+                >
                   Panel de Admin
-                </Link>
+                </button>
               </li>
             </ul>
           </div>
