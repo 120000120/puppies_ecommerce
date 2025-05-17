@@ -86,12 +86,14 @@ const Home = () => {
   const fetchRandomDogs = async () => {
     try {
       const { data, error } = await supabase
-        .from('dogs')
+        .from('dogs_new')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(12);
       
       if (error) throw error;
+      
+      console.log('Home - Fetched dogs from dogs_new:', data);
       
       // Shuffle the array and take the first 6
       const shuffledDogs = [...data]
@@ -100,7 +102,7 @@ const Home = () => {
       
       setRandomDogs(shuffledDogs);
     } catch (error) {
-      console.error('Error fetching random dogs:', error);
+      console.error('Error fetching random dogs from dogs_new:', error);
       setError(error.message);
     } finally {
       setLoading(false);

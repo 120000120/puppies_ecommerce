@@ -69,7 +69,7 @@ export const deliveryConditions = {
       ]
     },
     nio: {
-      title: "CONDICIONES DE ENTREGA – CACHORROS EN NICARAGUA",
+      title: "CONDICIONES DE ENTREGA – CACHORROS EN EL SALVADOR",
       conditions: [
         "1. Cuarentena preventiva",
         "Todos nuestros cachorros pasan por una cuarentena supervisada para asegurar su bienestar y descartar cualquier enfermedad viral. Tu nuevo compañero está completamente sano y listo para unirse a tu familia.",
@@ -198,7 +198,7 @@ export const deliveryConditions = {
       ]
     },
     nio: {
-      title: "CONDICIONES DE ENTREGA – CACHORROS EN NICARAGUA",
+      title: "CONDICIONES DE ENTREGA – CACHORROS EN EL SALVADOR",
       conditions: [
         "1. Cuarentena preventiva",
         "Todos nuestros cachorros pasan por una cuarentena supervisada para asegurar su bienestar y descartar cualquier enfermedad viral. Tu nuevo compañero está completamente sano y listo para unirse a tu familia.",

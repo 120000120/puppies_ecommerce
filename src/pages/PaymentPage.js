@@ -17,6 +17,41 @@ function PaymentPage() {
   
   const { dog, cat } = location.state || {};
 
+  const isEnglish = selectedCurrency === 'usd' || selectedCurrency === 'cad';
+
+  const getDisplayName = (pet) => {
+    if (!pet) return '';
+    if (isEnglish) {
+      return pet.name_en || pet.name;
+    }
+    return pet.name;
+  };
+
+  const getDisplayCharacteristics = (pet) => {
+    if (!pet) return '';
+    if (isEnglish) {
+      return pet.characteristics_en || pet.characteristics;
+    }
+    return pet.characteristics;
+  };
+
+  const getDisplayText = (text) => {
+    const translations = {
+      'Precio total': isEnglish ? 'Total Price' : 'Precio total',
+      'Imágenes de los Padres': isEnglish ? 'Parent Images' : 'Imágenes de los Padres',
+      'Padre 1': isEnglish ? 'Parent 1' : 'Padre 1',
+      'Padre 2': isEnglish ? 'Parent 2' : 'Padre 2',
+      'Detalles del Producto': isEnglish ? 'Product Details' : 'Detalles del Producto',
+      'Tamaño': isEnglish ? 'Size' : 'Tamaño',
+      'Peso': isEnglish ? 'Weight' : 'Peso',
+      'Altura': isEnglish ? 'Height' : 'Altura',
+      'Camadas': isEnglish ? 'Litters' : 'Camadas',
+      'Adoptar ahora': isEnglish ? 'Adopt now' : 'Adoptar ahora',
+      'Procesando...': isEnglish ? 'Processing...' : 'Procesando...'
+    };
+    return translations[text] || text;
+  };
+
   useEffect(() => {
     if (!dog && !cat) {
       navigate('/catalogo');
@@ -32,7 +67,7 @@ function PaymentPage() {
     try {
       const stripe = await stripePromise;
       const pet = dog || cat;
-      const price = getPriceByCurrency(pet);
+      const price = getPriceForCurrency(pet, selectedCurrency);
       
       const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
         method: 'POST',
@@ -43,8 +78,8 @@ function PaymentPage() {
         body: new URLSearchParams({
           'payment_method_types[]': 'card',
           'line_items[0][price_data][currency]': selectedCurrency,
-          'line_items[0][price_data][product_data][name]': pet.name,
-          'line_items[0][price_data][product_data][description]': pet.characteristics,
+          'line_items[0][price_data][product_data][name]': getDisplayName(pet),
+          'line_items[0][price_data][product_data][description]': getDisplayCharacteristics(pet),
           'line_items[0][price_data][product_data][images][]': pet.image_1,
           'line_items[0][price_data][unit_amount]': Math.round(price * 100),
           'line_items[0][quantity]': '1',
@@ -121,12 +156,37 @@ function PaymentPage() {
 
   const getPriceForCurrency = (pet, code) => {
     if (!pet) return 0;
-    if (code === 'usd') return pet.price;
-    if (code === 'cad') return pet.price_canada;
-    if (code === 'crc') return pet.price_costa_rica;
-    if (code === 'nio') return pet.price_nicaragua;
-    if (code === 'pab') return pet.price_panama;
-    return pet.price;
+    switch (code) {
+      case 'usd':
+        return pet.price_usd || pet.price;
+      case 'cad':
+        return pet.price_canada;
+      case 'crc':
+        return pet.price_costa_rica;
+      case 'nio':
+        return pet.price_salvador;
+      case 'pab':
+        return pet.price_panama;
+      default:
+        return pet.price_usd || pet.price;
+    }
+  };
+
+  const getCountryAndCurrency = (currency) => {
+    switch (currency) {
+      case 'usd':
+        return { country: 'United States', symbol: 'USD' };
+      case 'cad':
+        return { country: 'Canada', symbol: 'CAD' };
+      case 'crc':
+        return { country: 'Costa Rica', symbol: 'CRC' };
+      case 'nio':
+        return { country: 'El Salvador', symbol: 'NIO' };
+      case 'pab':
+        return { country: 'Panama', symbol: 'PAB' };
+      default:
+        return { country: 'United States', symbol: 'USD' };
+    }
   };
 
   return (
@@ -138,7 +198,7 @@ function PaymentPage() {
             <div className="bg-gray-800 rounded-lg overflow-hidden">
               <img
                 src={images[currentImageIndex]}
-                alt={pet.name}
+                alt={getDisplayName(pet)}
                 className="w-full aspect-h-10 object-cover"
               />
             </div>
@@ -154,14 +214,13 @@ function PaymentPage() {
                 >
                   <img
                     src={image}
-                    alt={`${pet.name} ${index + 1}`}
+                    alt={`${getDisplayName(pet)} ${index + 1}`}
                     className="w-full h-full object-cover"
                   />
                 </button>
               ))}
             </div>
 
-            {/* Add DeliveryConditions component here */}
             <DeliveryConditions isCat={!!cat} />
           </div>
 
@@ -169,13 +228,13 @@ function PaymentPage() {
           <div className="space-y-4">
             {/* Imágenes de los padres */}
             <div className="bg-gray-800 p-3 rounded-lg border border-yellow-500/20">
-              <h2 className="text-lg font-bold mb-2 text-yellow-400">Imágenes de los Padres</h2>
+              <h2 className="text-lg font-bold mb-2 text-yellow-400">{getDisplayText('Imágenes de los Padres')}</h2>
               <div className="grid grid-cols-2 gap-2">
                 {(dog ? dog.image_father_1 : cat.image_father_1) && (
                   <div className="aspect-w-16 aspect-h-10">
                     <img 
                       src={dog ? dog.image_father_1 : cat.image_father_1} 
-                      alt="Padre 1" 
+                      alt={getDisplayText('Padre 1')} 
                       className="w-full h-full object-cover rounded-lg"
                     />
                   </div>
@@ -184,7 +243,7 @@ function PaymentPage() {
                   <div className="aspect-w-16 aspect-h-10">
                     <img 
                       src={dog ? dog.image_father_2 : cat.image_father_2} 
-                      alt="Padre 2" 
+                      alt={getDisplayText('Padre 2')} 
                       className="w-full h-full object-cover rounded-lg"
                     />
                   </div>
@@ -194,27 +253,27 @@ function PaymentPage() {
 
             {/* Información del producto */}
             <div className="bg-gray-800 p-4 rounded-lg border border-yellow-500/20">
-              <h2 className="text-lg font-bold mb-2 text-yellow-400">Detalles del Producto</h2>
-              <h3 className="text-base font-bold mb-1 text-white">{pet.name}</h3>
-              <p className="text-sm text-gray-300 mb-3">{pet.characteristics}</p>
+              <h2 className="text-lg font-bold mb-2 text-yellow-400">{getDisplayText('Detalles del Producto')}</h2>
+              <h3 className="text-base font-bold mb-1 text-white">{getDisplayName(pet)}</h3>
+              <p className="text-sm text-gray-300 mb-3">{getDisplayCharacteristics(pet)}</p>
               
               <div className="grid grid-cols-2 gap-2 mb-3">
                 <div className="bg-gray-700/50 p-2 rounded-lg">
-                  <span className="text-xs text-gray-400 block mb-0.5">Tamaño</span>
+                  <span className="text-xs text-gray-400 block mb-0.5">{getDisplayText('Tamaño')}</span>
                   <span className="text-sm text-white font-medium">{pet.size}</span>
                 </div>
                 {dog && (
                   <>
                     <div className="bg-gray-700/50 p-2 rounded-lg">
-                      <span className="text-xs text-gray-400 block mb-0.5">Peso</span>
+                      <span className="text-xs text-gray-400 block mb-0.5">{getDisplayText('Peso')}</span>
                       <span className="text-sm text-white font-medium">{dog.weight}</span>
                     </div>
                     <div className="bg-gray-700/50 p-2 rounded-lg">
-                      <span className="text-xs text-gray-400 block mb-0.5">Altura</span>
+                      <span className="text-xs text-gray-400 block mb-0.5">{getDisplayText('Altura')}</span>
                       <span className="text-sm text-white font-medium">{dog.height}</span>
                     </div>
                     <div className="bg-gray-700/50 p-2 rounded-lg">
-                      <span className="text-xs text-gray-400 block mb-0.5">Camadas</span>
+                      <span className="text-xs text-gray-400 block mb-0.5">{getDisplayText('Camadas')}</span>
                       <span className="text-sm text-white font-medium">{dog.litters}</span>
                     </div>
                   </>
@@ -223,8 +282,11 @@ function PaymentPage() {
 
               <div className="border-t border-gray-700 pt-3 mt-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-400">Precio total</span>
-                  <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-400">{getDisplayText('Precio total')}</span>
+                  <div className="flex flex-col items-end">
+                    <span className="text-sm text-gray-400">
+                      {getCountryAndCurrency(selectedCurrency).country} - {getCountryAndCurrency(selectedCurrency).symbol}
+                    </span>
                     <span className="text-xl font-bold text-yellow-400">
                       {new Intl.NumberFormat(selectedCurrency === 'usd' ? 'en-US' : 
                         selectedCurrency === 'cad' ? 'en-CA' : 
@@ -239,18 +301,6 @@ function PaymentPage() {
                     </span>
                   </div>
                 </div>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {allCurrencies.map((cur) => (
-                    <span key={cur.code} className="text-xs bg-gray-800 text-yellow-300 px-2 py-1 rounded">
-                      {new Intl.NumberFormat(cur.locale, {
-                        style: 'currency',
-                        currency: cur.label,
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0
-                      }).format(getPriceForCurrency(pet, cur.code))} {cur.label}
-                    </span>
-                  ))}
-                </div>
               </div>
             </div>
 
@@ -261,7 +311,7 @@ function PaymentPage() {
                 disabled={isLoading}
                 className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 px-6 rounded-lg shadow-lg transition-all transform hover:scale-105 disabled:opacity-50"
               >
-                {isLoading ? 'Procesando...' : 'Adoptar ahora'}
+                {isLoading ? getDisplayText('Procesando...') : getDisplayText('Adoptar ahora')}
               </button>
             </div>
           </div>

@@ -15,7 +15,7 @@ const CatCard = ({ cat }) => {
       case 'crc':
         return { country: 'Costa Rica', symbol: 'CRC' };
       case 'nio':
-        return { country: 'Nicaragua', symbol: 'NIO' };
+        return { country: 'El Salvador', symbol: 'NIO' };
       case 'pab':
         return { country: 'Panamá', symbol: 'PAB' };
       default:

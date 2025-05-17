@@ -48,16 +48,11 @@ export const CurrencyProvider = ({ children }) => {
   const getPriceByCurrency = (pet) => {
     if (!pet) return 0;
 
-    // Si es Canadá y es un perro, siempre devolvemos el precio en USD
-    if (selectedCurrency === 'cad' && pet.hasOwnProperty('weight')) {
-      return pet.price;
-    }
-
     const priceMap = {
       usd: pet.price,
       cad: pet.price_canada,
       pab: pet.price_panama,
-      nio: pet.price_nicaragua,
+      nio: pet.price_salvador,
       crc: pet.price_costa_rica
     };
 
@@ -66,11 +61,6 @@ export const CurrencyProvider = ({ children }) => {
 
   const getDisplayCurrency = (pet) => {
     if (!pet) return selectedCurrency;
-
-    // Si es Canadá y es un perro, siempre mostramos USD
-    if (selectedCurrency === 'cad' && pet.hasOwnProperty('weight')) {
-      return 'usd';
-    }
 
     // Lógica especial para Costa Rica
     if (selectedCurrency === 'crc') {

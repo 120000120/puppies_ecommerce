@@ -13,7 +13,7 @@ const Header = () => {
     { code: 'usd', name: isEnglish ? 'United States' : 'Estados Unidos', flag: 'https://flagcdn.com/w20/us.png' },
     { code: 'cad', name: isEnglish ? 'Canada' : 'Canadá', flag: 'https://flagcdn.com/w20/ca.png' },
     { code: 'crc', name: 'Costa Rica', flag: 'https://flagcdn.com/w20/cr.png' },
-    { code: 'nio', name: 'Nicaragua', flag: 'https://flagcdn.com/w20/ni.png' },
+    { code: 'nio', name: isEnglish ? 'El Salvador' : 'El Salvador', flag: 'https://flagcdn.com/w20/sv.png' },
     { code: 'pab', name: 'Panamá', flag: 'https://flagcdn.com/w20/pa.png' }
   ];
 
