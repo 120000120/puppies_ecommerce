@@ -8,69 +8,6 @@ import { supabase } from '../lib/supabase';
 import { Link } from 'react-router-dom';
 import { useCurrency } from '../context/CurrencyContext';
 
-const testimonials = [
-  {
-    id: 1,
-    name: "Familia Hall",
-    location: "Newfoundland",
-    pet: "Gatito Sphynx",
-    text: "He instantly bonded with our youngest — they're inseparable now.",
-    rating: 5,
-    date: "15 Enero 2024",
-    petImage: "/Sphynx.png"
-  },
-  {
-    id: 2,
-    name: "Familia Lambert",
-    location: "Quebec",
-    pet: "Gatito Maine Coon",
-    text: "Every little purr is like music at home. We adore her.",
-    rating: 5,
-    date: "10 Mayo 2024",
-    petImage: "/Maine-Coon.png"
-  },
-  {
-    id: 3,
-    name: "Familia McNeil",
-    location: "Alberta",
-    pet: "Perrito Golden Retriever",
-    text: "Thanks to you, we found not just a pet but a lifelong friend.",
-    rating: 5,
-    date: "1 Abril 2024",
-    petImage: "/golden.png"
-  },
-  {
-    id: 4,
-    name: "Familia Deschamps",
-    location: "Quebec",
-    pet: "Gatito Ragdoll",
-    text: "Thanks to you, we found not just a pet but a lifelong friend.",
-    rating: 5,
-    date: "5 Marzo 2024",
-    petImage: "Ragdoll.png"
-  },
-  {
-    id: 5,
-    name: "Familia Palmer",
-    location: "Houston",
-    pet: "Perrito Shih Tzu",
-    text: "We were surprised at how well-trained and loving he was from day one.",
-    rating: 5,
-    date: "20 Marzo 2024",
-    petImage: "shitzu.png"
-  },
-  {
-    id: 6,
-    name: "Familia Ross",
-    location: "Alberta",
-    pet: "Perrito Pomeranian",
-    text: "They have filled our home with joy and light.",
-    rating: 5,
-    date: "1 Noviembre 2024",
-    petImage: "Pomeranian.png"
-  }
-];
-
 const Home = () => {
   const [randomDogs, setRandomDogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -78,6 +15,81 @@ const Home = () => {
   const { selectedCurrency } = useCurrency();
 
   const isEnglish = selectedCurrency === 'usd' || selectedCurrency === 'cad';
+
+  const testimonials = [
+    {
+      id: 1,
+      name: "Hall Family",
+      location: "Newfoundland",
+      pet: isEnglish ? "Sphynx Kitten" : "Gatito Sphynx",
+      text: isEnglish 
+        ? "He instantly bonded with our youngest — they're inseparable now."
+        : "Se vinculó instantáneamente con nuestro hijo menor — ahora son inseparables.",
+      rating: 5,
+      date: isEnglish ? "January 15, 2024" : "15 Enero 2024",
+      petImage: "/Sphynx.png"
+    },
+    {
+      id: 2,
+      name: "Lambert Family",
+      location: "Quebec",
+      pet: isEnglish ? "Maine Coon Kitten" : "Gatito Maine Coon",
+      text: isEnglish 
+        ? "Every little purr is like music at home. We adore her."
+        : "Cada pequeño ronroneo es como música en casa. La adoramos.",
+      rating: 5,
+      date: isEnglish ? "May 10, 2024" : "10 Mayo 2024",
+      petImage: "/Maine-Coon.png"
+    },
+    {
+      id: 3,
+      name: "McNeil Family",
+      location: "Houston",
+      pet: isEnglish ? "Golden Retriever Puppy" : "Perrito Golden Retriever",
+      text: isEnglish 
+        ? "Thanks to you, we found not just a pet but a lifelong friend."
+        : "Gracias a ustedes, encontramos no solo una mascota sino un amigo para toda la vida.",
+      rating: 5,
+      date: isEnglish ? "April 1, 2024" : "1 Abril 2024",
+      petImage: "/golden.png"
+    },
+    {
+      id: 4,
+      name: "Deschamps Family",
+      location: "Quebec",
+      pet: isEnglish ? "Ragdoll Kitten" : "Gatito Ragdoll",
+      text: isEnglish 
+        ? "Thanks to you, we found not just a pet but a lifelong friend."
+        : "Gracias a ustedes, encontramos no solo una mascota sino un amigo para toda la vida.",
+      rating: 5,
+      date: isEnglish ? "March 5, 2024" : "5 Marzo 2024",
+      petImage: "Ragdoll.png"
+    },
+    {
+      id: 5,
+      name: "Palmer Family",
+      location: "Houston",
+      pet: isEnglish ? "Shih Tzu Puppy" : "Perrito Shih Tzu",
+      text: isEnglish 
+        ? "We were surprised at how well-trained and loving he was from day one."
+        : "Nos sorprendió lo bien entrenado y cariñoso que era desde el primer día.",
+      rating: 5,
+      date: isEnglish ? "March 20, 2024" : "20 Marzo 2024",
+      petImage: "shitzu.png"
+    },
+    {
+      id: 6,
+      name: "Ross Family",
+      location: "San Antonio",
+      pet: isEnglish ? "Pomeranian Puppy" : "Perrito Pomeranian",
+      text: isEnglish 
+        ? "They have filled our home with joy and light."
+        : "Han llenado nuestro hogar de alegría y luz.",
+      rating: 5,
+      date: isEnglish ? "November 1, 2024" : "1 Noviembre 2024",
+      petImage: "Pomeranian.png"
+    }
+  ];
 
   useEffect(() => {
     fetchRandomDogs();

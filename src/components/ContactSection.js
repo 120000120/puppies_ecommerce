@@ -80,13 +80,12 @@ const ContactSection = () => {
                       </h3>
                       <div className="text-gray-300 space-y-2 text-lg">
                       <p className="flex items-center">
-                        <span className="font-medium">{isEnglish ? 'Monday to Friday:' : 'Lunes a Viernes:'}</span> 9:00 AM - 7:00 PM
+                        <span className="font-medium text-yellow-400">{isEnglish ? '24/7 Service' : 'Servicio 24/7'}</span>
                       </p>
-                      <p className="flex items-center">
-                        <span className="font-medium">{isEnglish ? 'Saturdays:' : 'Sábados:'}</span> 10:00 AM - 4:00 PM
-                      </p>
-                      <p className="flex items-center">
-                        <span className="font-medium">{isEnglish ? 'Sundays:' : 'Domingos:'}</span> {isEnglish ? 'By appointment' : 'Previa cita'}
+                      <p className="text-gray-400 text-base">
+                        {isEnglish 
+                          ? 'We are available to assist you at any time, ensuring you find your perfect companion whenever you need us.'
+                          : 'Estamos disponibles para ayudarte en cualquier momento, asegurando que encuentres a tu compañero perfecto cuando lo necesites.'}
                       </p>
                     </div>
                   </div>
