@@ -3,6 +3,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useCurrency } from '../context/CurrencyContext';
 import DeliveryConditions from '../components/DeliveryConditions';
+import { supabase } from '../lib/supabase';
 
 // Inicializar Stripe con la clave pública
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
@@ -14,8 +15,10 @@ function PaymentPage() {
   const [stripeError, setStripeError] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { selectedCurrency, getPriceByCurrency } = useCurrency();
+  const [dog, setDog] = useState(location.state?.dog);
+  const [cat, setCat] = useState(location.state?.cat);
   
-  const { dog, cat } = location.state || {};
+  const { dog: initialDog, cat: initialCat } = location.state || {};
 
   const isEnglish = selectedCurrency === 'usd' || selectedCurrency === 'cad';
 
@@ -60,6 +63,55 @@ function PaymentPage() {
       navigate('/catalogo');
       return;
     }
+
+    // Log para debugging
+    console.log('Pet data:', dog || cat);
+    console.log('Testimonials:', {
+      english: (dog || cat)?.testimonies_english,
+      spanish: (dog || cat)?.testimonies_spanish,
+      date: (dog || cat)?.fecha_testimonio,
+      family: (dog || cat)?.nombre_familia,
+      location: (dog || cat)?.ubicacion,
+      country: (dog || cat)?.pais,
+      type: (dog || cat)?.tipo_mascota,
+      breed: (dog || cat)?.raza
+    });
+
+    // Actualizar los datos del perro/gato con los testimonios
+    const fetchPetWithTestimonials = async () => {
+      try {
+        const table = dog ? 'dogs_new' : 'cats';
+        const { data, error } = await supabase
+          .from(table)
+          .select(`
+            *,
+            testimonies_english,
+            testimonies_spanish,
+            fecha_testimonio,
+            nombre_familia,
+            ubicacion,
+            pais,
+            tipo_mascota,
+            raza
+          `)
+          .eq('id', (dog || cat).id)
+          .single();
+
+        if (error) throw error;
+        
+        if (data) {
+          if (dog) {
+            setDog(data);
+          } else {
+            setCat(data);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching pet with testimonials:', error);
+      }
+    };
+
+    fetchPetWithTestimonials();
   }, [dog, cat, navigate]);
 
   const handlePayment = async (e) => {
@@ -317,6 +369,81 @@ function PaymentPage() {
                 {isLoading ? getDisplayText('Procesando...') : getDisplayText('Adoptar ahora')}
               </button>
             </div>
+
+            {/* Testimonios */}
+            {((pet.testimonies_english && pet.testimonies_english.trim() !== '') || 
+              (pet.testimonies_spanish && pet.testimonies_spanish.trim() !== '')) ? (
+              <div className="bg-gray-800 p-4 rounded-lg border border-yellow-500/20 mt-4">
+                <h2 className="text-lg font-bold mb-4 text-yellow-400">
+                  {isEnglish ? 'What Our Clients Say' : 'Lo Que Dicen Nuestros Clientes'}
+                </h2>
+                <div className="space-y-4">
+                  {isEnglish ? (
+                    pet.testimonies_english && pet.testimonies_english.trim() !== '' && (
+                      <div className="bg-gray-700/50 p-4 rounded-lg">
+                        <div className="flex items-start space-x-4">
+                          <div className="flex-1">
+                            <p className="text-gray-300 italic mb-2">"{pet.testimonies_english}"</p>
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-white font-medium">{pet.nombre_familia || 'Anonymous'}</p>
+                                <p className="text-gray-400 text-sm">
+                                  {pet.ubicacion && pet.pais ? `${pet.ubicacion}, ${pet.pais}` : 'Location not specified'}
+                                </p>
+                              </div>
+                              {pet.fecha_testimonio && (
+                                <div className="text-yellow-400 text-sm">
+                                  {new Date(pet.fecha_testimonio).toLocaleDateString(
+                                    'en-US',
+                                    { year: 'numeric', month: 'long', day: 'numeric' }
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                            {(pet.tipo_mascota || pet.raza) && (
+                              <p className="text-yellow-400 text-sm mt-2">
+                                {[pet.tipo_mascota, pet.raza].filter(Boolean).join(' - ')}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  ) : (
+                    pet.testimonies_spanish && pet.testimonies_spanish.trim() !== '' && (
+                      <div className="bg-gray-700/50 p-4 rounded-lg">
+                        <div className="flex items-start space-x-4">
+                          <div className="flex-1">
+                            <p className="text-gray-300 italic mb-2">"{pet.testimonies_spanish}"</p>
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-white font-medium">{pet.nombre_familia || 'Anónimo'}</p>
+                                <p className="text-gray-400 text-sm">
+                                  {pet.ubicacion && pet.pais ? `${pet.ubicacion}, ${pet.pais}` : 'Ubicación no especificada'}
+                                </p>
+                              </div>
+                              {pet.fecha_testimonio && (
+                                <div className="text-yellow-400 text-sm">
+                                  {new Date(pet.fecha_testimonio).toLocaleDateString(
+                                    'es-ES',
+                                    { year: 'numeric', month: 'long', day: 'numeric' }
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                            {(pet.tipo_mascota || pet.raza) && (
+                              <p className="text-yellow-400 text-sm mt-2">
+                                {[pet.tipo_mascota, pet.raza].filter(Boolean).join(' - ')}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
