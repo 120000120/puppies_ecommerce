@@ -360,7 +360,7 @@ const DogCard = ({ dog }) => {
                 </svg>
               </Link>
               <a
-                href={`https://wa.me/50661537799?text=${encodeURIComponent(
+                href={`https://wa.me/17064097145?text=${encodeURIComponent(
                   isEnglish 
                     ? `Hello, I'm interested in this beautiful puppy ${displayName} 🐕\n\n${dog.image_1}`
                     : `Hola, estoy interesado en este hermoso cachorrito ${displayName} 🐕\n\n${dog.image_1}`

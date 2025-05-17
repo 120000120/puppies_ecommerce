@@ -30,6 +30,9 @@ function PaymentPage() {
   const getDisplayCharacteristics = (pet) => {
     if (!pet) return '';
     if (isEnglish) {
+      if (!pet.characteristics_en) {
+        console.warn('PaymentPage - characteristics_en not found for:', pet.name);
+      }
       return pet.characteristics_en || pet.characteristics;
     }
     return pet.characteristics;
