@@ -19,11 +19,12 @@ const CatCatalog = () => {
   const fetchCats = async () => {
     try {
       const { data, error } = await supabase
-        .from('cats')
+        .from('cats_new')
         .select('*')
         .order('name');
       
       if (error) throw error;
+      console.log('Fetched cats from cats_new:', data);
       setCats(data);
     } catch (error) {
       console.error('Error fetching cats:', error);
@@ -35,8 +36,17 @@ const CatCatalog = () => {
   // Filter cats
   const filteredCats = cats.filter(cat => {
     // Search filter
-    const matchesSearch = cat.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          cat.characteristics.toLowerCase().includes(searchTerm.toLowerCase());
+    const searchFields = [
+      cat.name,
+      cat.characteristics,
+      cat.characteristics_english,
+      cat.salud_general,
+      cat.salud_english
+    ].filter(Boolean);
+    
+    const matchesSearch = searchFields.some(field => 
+      field.toLowerCase().includes(searchTerm.toLowerCase())
+    );
     
     // Size filter
     const matchesSize = selectedSize === '' || cat.size.includes(selectedSize);
@@ -104,10 +114,10 @@ const CatCatalog = () => {
                 onChange={(e) => setSelectedSize(e.target.value)}
               >
                 <option value="">{isEnglish ? 'All sizes' : 'Todos los tamaños'}</option>
-                <option value="Small breeds">{isEnglish ? 'Small' : 'Pequeño'}</option>
-                <option value="Medium breeds">{isEnglish ? 'Medium' : 'Mediano'}</option>
-                <option value="Large breeds">{isEnglish ? 'Large' : 'Grande'}</option>
-                <option value="Exotic breeds">{isEnglish ? 'Exotic' : 'Exótico'}</option>
+                <option value="Estándar">{isEnglish ? 'Standard' : 'Estándar'}</option>
+                <option value="Pequeño">{isEnglish ? 'Small' : 'Pequeño'}</option>
+                <option value="Mediano">{isEnglish ? 'Medium' : 'Mediano'}</option>
+                <option value="Grande">{isEnglish ? 'Large' : 'Grande'}</option>
               </select>
             </div>
             

@@ -12,6 +12,7 @@ import AdminPage from './pages/AdminPage';
 import PaymentPage from './pages/PaymentPage';
 import SuccessPage from './pages/SuccessPage';
 import CancelPage from './pages/CancelPage';
+import CatPaymentPage from './pages/CatPaymentPage';
 
 const App = () => {
   return (
@@ -26,6 +27,7 @@ const App = () => {
             <Route path="/contacto" element={<ContactPage />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/payment" element={<PaymentPage />} />
+            <Route path="/cat-payment" element={<CatPaymentPage />} />
             <Route path="/success" element={<SuccessPage />} />
             <Route path="/cancel" element={<CancelPage />} />
           </Routes>
