@@ -26,6 +26,7 @@ const AdminPage = () => {
     price: '',
     image: ''
   });
+  const [uploadProgress, setUploadProgress] = useState({});
 
   useEffect(() => {
     // Verificar si ya está autenticado
@@ -83,7 +84,7 @@ const AdminPage = () => {
   const fetchPets = async () => {
     try {
       setLoading(true);
-      const table = activeTab === 'dogs' ? 'dogs' : 'cats';
+      const table = activeTab === 'dogs' ? 'dogs_new' : 'cats_new';
       console.log('Fetching pets from table:', table);
       
       const { data, error } = await supabase
@@ -130,37 +131,30 @@ const AdminPage = () => {
       const bucket = activeTab === 'dogs' ? 'perrosimagenes' : 'gatosimagenes';
       const filePath = `${fileName}`;
 
-      // Verificar si el bucket existe y tiene los permisos correctos
-      const { data: bucketData, error: bucketError } = await supabase.storage
-        .from(bucket)
-        .list();
+      // Progreso de carga
+      setUploadProgress((prev) => ({ ...prev, [field]: 0 }));
 
-      if (bucketError) {
-        console.error('Error accessing bucket:', bucketError);
-        alert('Error al acceder al almacenamiento. Por favor, verifica los permisos del bucket.');
-        return;
-      }
-
-      // Primero intentamos eliminar la imagen anterior si existe
-      if (isEditing && editingPet[field]) {
-        const oldImagePath = editingPet[field].split('/').pop();
-        try {
-          await supabase.storage
-            .from(bucket)
-            .remove([oldImagePath]);
-        } catch (error) {
-          console.error('Error deleting old image:', error);
+      // Subir la imagen con progreso
+      const upload = supabase.storage.from(bucket).upload(filePath, file, {
+        upsert: true,
+        cacheControl: '3600',
+        contentType: file.type,
+        onUploadProgress: (event) => {
+          if (event && event.total) {
+            const percent = Math.round((event.loaded / event.total) * 100);
+            setUploadProgress((prev) => ({ ...prev, [field]: percent }));
+          }
         }
-      }
+      });
 
-      // Subir la nueva imagen
-      const { error: uploadError } = await supabase.storage
-        .from(bucket)
-        .upload(filePath, file, { 
-          upsert: true,
-          cacheControl: '3600',
-          contentType: file.type
-        });
+      // Fallback para onUploadProgress si no está soportado
+      let uploadResult;
+      if (upload instanceof Promise) {
+        uploadResult = await upload;
+      } else {
+        uploadResult = await upload;
+      }
+      const { error: uploadError } = uploadResult;
 
       if (uploadError) {
         console.error('Upload error details:', uploadError);
@@ -176,9 +170,11 @@ const AdminPage = () => {
       } else {
         setNewPet({ ...newPet, [field]: publicUrl });
       }
+      setUploadProgress((prev) => ({ ...prev, [field]: 100 }));
     } catch (error) {
       console.error('Error uploading image:', error);
       alert('Error al subir la imagen. Por favor, verifica que:\n1. El bucket existe\n2. Tienes los permisos correctos\n3. El archivo es una imagen válida');
+      setUploadProgress((prev) => ({ ...prev, [field]: 0 }));
     } finally {
       setUploadingImage(false);
     }
@@ -200,7 +196,7 @@ const AdminPage = () => {
   const handleUpdatePet = async (e) => {
     e.preventDefault();
     try {
-      const table = activeTab === 'dogs' ? 'dogs' : 'cats';
+      const table = activeTab === 'dogs' ? 'dogs_new' : 'cats_new';
       const { error } = await supabase
         .from(table)
         .update(editingPet)
@@ -217,9 +213,35 @@ const AdminPage = () => {
   const handleAddPet = async (e) => {
     e.preventDefault();
     try {
-      const table = activeTab === 'dogs' ? 'dogs' : 'cats';
-      const { image, ...petData } = newPet;
-      petData.litters = parseInt(petData.litters, 10) || 0;
+      const table = activeTab === 'dogs' ? 'dogs_new' : 'cats_new';
+      // Filtrar solo los campos válidos para cada tabla
+      let petData = { ...newPet };
+      if (activeTab === 'dogs') {
+        const allowedFields = [
+          'name', 'name_en', 'size', 'characteristics', 'characteristics_en', 'price', 'price_canada', 'price_costa_rica', 'price_salvador', 'price_panama',
+          'weight', 'height', 'litters',
+          'image_1', 'image_2', 'image_3', 'image_4', 'image_5', 'image_6', 'image_father_1', 'image_father_2',
+          'testimonies_spanish', 'testimonies_english', 'fecha_testimonio', 'nombre_familia', 'pais', 'ubicacion', 'tipo_mascota', 'raza'
+        ];
+        petData = Object.fromEntries(Object.entries(petData).filter(([key, value]) => allowedFields.includes(key) && value !== undefined && value !== null && value !== ''));
+      } else {
+        const allowedFields = [
+          'name', 'size', 'characteristics', 'characteristics_english', 'price', 'price_canada', 'price_costa_rica', 'price_salvador', 'price_panama',
+          'salud_general', 'salud_english',
+          'image_1', 'image_2', 'image_3', 'image_4', 'image_5', 'image_6', 'image_father_1', 'image_father_2', 'image_mother_1', 'image_mother_2',
+          'testimonio', 'nombre_de_la_familia', 'fecha', 'pais', 'ubicacion', 'tipo_de_mascota', 'raza'
+        ];
+        petData = Object.fromEntries(Object.entries(petData).filter(([key, value]) => allowedFields.includes(key) && value !== undefined && value !== null && value !== ''));
+      }
+      // No enviar el campo id
+      delete petData.id;
+      // Recortar campos de texto a 255 caracteres si es necesario
+      Object.keys(petData).forEach((key) => {
+        if (typeof petData[key] === 'string' && petData[key].length > 255) {
+          petData[key] = petData[key].substring(0, 255);
+        }
+      });
+      if ('litters' in petData) petData.litters = parseInt(petData.litters, 10) || 0;
       const { error } = await supabase
         .from(table)
         .insert([petData]);
@@ -253,7 +275,7 @@ const AdminPage = () => {
 
     try {
       setLoading(true);
-      const table = activeTab === 'dogs' ? 'dogs' : 'cats';
+      const table = activeTab === 'dogs' ? 'dogs_new' : 'cats_new';
       const bucket = activeTab === 'dogs' ? 'perrosimagenes' : 'gatosimagenes';
 
       console.log('Deleting pet with ID:', id);
@@ -450,16 +472,30 @@ const AdminPage = () => {
                 <label className="block text-sm font-medium text-white mb-1">Nombre</label>
                 <input
                   type="text"
+                  maxLength={255}
                   value={newPet.name}
                   onChange={(e) => setNewPet({ ...newPet, name: e.target.value })}
                   className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
                   required
                 />
               </div>
+              {activeTab === 'dogs' && (
+                <div>
+                  <label className="block text-sm font-medium text-white mb-1">Nombre (Inglés)</label>
+                  <input
+                    type="text"
+                    maxLength={255}
+                    value={newPet.name_en || ''}
+                    onChange={(e) => setNewPet({ ...newPet, name_en: e.target.value })}
+                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                  />
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-medium text-white mb-1">Tamaño</label>
                 <input
                   type="text"
+                  maxLength={255}
                   value={newPet.size}
                   onChange={(e) => setNewPet({ ...newPet, size: e.target.value })}
                   className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
@@ -470,54 +506,302 @@ const AdminPage = () => {
                 <label className="block text-sm font-medium text-white mb-1">Características</label>
                 <input
                   type="text"
+                  maxLength={255}
                   value={newPet.characteristics}
                   onChange={(e) => setNewPet({ ...newPet, characteristics: e.target.value })}
                   className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
                   required
                 />
               </div>
+              {activeTab === 'dogs' && (
+                <div>
+                  <label className="block text-sm font-medium text-white mb-1">Características (Inglés)</label>
+                  <input
+                    type="text"
+                    maxLength={255}
+                    value={newPet.characteristics_en || ''}
+                    onChange={(e) => setNewPet({ ...newPet, characteristics_en: e.target.value })}
+                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                  />
+                </div>
+              )}
+              {activeTab === 'cats' && (
+                <div>
+                  <label className="block text-sm font-medium text-white mb-1">Características (Inglés)</label>
+                  <input
+                    type="text"
+                    maxLength={255}
+                    value={newPet.characteristics_english || ''}
+                    onChange={(e) => setNewPet({ ...newPet, characteristics_english: e.target.value })}
+                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                  />
+                </div>
+              )}
               <div>
-                <label className="block text-sm font-medium text-white mb-1">Peso</label>
-                <input
-                  type="text"
-                  value={newPet.weight}
-                  onChange={(e) => setNewPet({ ...newPet, weight: e.target.value })}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Altura</label>
-                <input
-                  type="text"
-                  value={newPet.height}
-                  onChange={(e) => setNewPet({ ...newPet, height: e.target.value })}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Camadas</label>
-                <input
-                  type="text"
-                  value={newPet.litters}
-                  onChange={(e) => setNewPet({ ...newPet, litters: e.target.value })}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Precio (USD)</label>
+                <label className="block text-sm font-medium text-white mb-1">Precio (USD)</label>
                 <input
                   type="number"
+                  min={0}
+                  step="0.01"
                   value={newPet.price}
                   onChange={(e) => setNewPet({ ...newPet, price: e.target.value })}
                   className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
                   required
                 />
               </div>
-              <div className="col-span-2 grid grid-cols-2 gap-4 mb-4">
-                {["image_1", "image_2", "image_3", "image_4", "father_image", "mother_image"].map((field) => (
+              <div>
+                <label className="block text-xs font-medium text-white mb-1">Precio Canadá (CAD)</label>
+                <input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={newPet.price_canada || ''}
+                  onChange={(e) => setNewPet({ ...newPet, price_canada: e.target.value })}
+                  className="w-full px-2 py-1 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-white mb-1">Precio Costa Rica (CRC)</label>
+                <input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={newPet.price_costa_rica || ''}
+                  onChange={(e) => setNewPet({ ...newPet, price_costa_rica: e.target.value })}
+                  className="w-full px-2 py-1 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-white mb-1">Precio El Salvador (SVC)</label>
+                <input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={newPet.price_salvador || ''}
+                  onChange={(e) => setNewPet({ ...newPet, price_salvador: e.target.value })}
+                  className="w-full px-2 py-1 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-white mb-1">Precio Panamá (PAB)</label>
+                <input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={newPet.price_panama || ''}
+                  onChange={(e) => setNewPet({ ...newPet, price_panama: e.target.value })}
+                  className="w-full px-2 py-1 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                />
+              </div>
+              {activeTab === 'dogs' && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-1">Peso</label>
+                    <input
+                      type="text"
+                      maxLength={255}
+                      value={newPet.weight || ''}
+                      onChange={(e) => setNewPet({ ...newPet, weight: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-1">Altura</label>
+                    <input
+                      type="text"
+                      maxLength={255}
+                      value={newPet.height || ''}
+                      onChange={(e) => setNewPet({ ...newPet, height: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-1">Camadas</label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={newPet.litters || ''}
+                      onChange={(e) => setNewPet({ ...newPet, litters: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                    />
+                  </div>
+                </>
+              )}
+              {activeTab === 'cats' && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-1">Salud General</label>
+                    <input
+                      type="text"
+                      value={newPet.salud_general || ''}
+                      onChange={(e) => setNewPet({ ...newPet, salud_general: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-1">Salud (Inglés)</label>
+                    <input
+                      type="text"
+                      value={newPet.salud_english || ''}
+                      onChange={(e) => setNewPet({ ...newPet, salud_english: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                    />
+                  </div>
+                </>
+              )}
+              {/* Testimonios para gatos */}
+              {activeTab === 'cats' && (
+                <>
+                  <div className="col-span-2">
+                    <h4 className="text-lg font-bold text-yellow-500 mt-8 mb-2">Testimonio</h4>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-1">Testimonio</label>
+                    <textarea
+                      value={newPet.testimonio || ''}
+                      onChange={(e) => setNewPet({ ...newPet, testimonio: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                      rows={2}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-1">Nombre de la familia</label>
+                    <input
+                      type="text"
+                      value={newPet.nombre_de_la_familia || ''}
+                      onChange={(e) => setNewPet({ ...newPet, nombre_de_la_familia: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-1">Fecha del testimonio</label>
+                    <input
+                      type="date"
+                      value={newPet.fecha || ''}
+                      onChange={(e) => setNewPet({ ...newPet, fecha: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-1">País</label>
+                    <input
+                      type="text"
+                      value={newPet.pais || ''}
+                      onChange={(e) => setNewPet({ ...newPet, pais: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-1">Ubicación</label>
+                    <input
+                      type="text"
+                      value={newPet.ubicacion || ''}
+                      onChange={(e) => setNewPet({ ...newPet, ubicacion: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-1">Tipo de mascota</label>
+                    <input
+                      type="text"
+                      value={newPet.tipo_de_mascota || ''}
+                      onChange={(e) => setNewPet({ ...newPet, tipo_de_mascota: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-1">Raza</label>
+                    <input
+                      type="text"
+                      value={newPet.raza || ''}
+                      onChange={(e) => setNewPet({ ...newPet, raza: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                    />
+                  </div>
+                </>
+              )}
+              {/* Testimonios para perros */}
+              {activeTab === 'dogs' && (
+                <>
+                  <div className="col-span-2">
+                    <h4 className="text-lg font-bold text-yellow-500 mt-8 mb-2">Testimonios</h4>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-1">Testimonio (Español)</label>
+                    <textarea
+                      value={newPet.testimonies_spanish || ''}
+                      onChange={(e) => setNewPet({ ...newPet, testimonies_spanish: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                      rows={2}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-1">Testimonio (Inglés)</label>
+                    <textarea
+                      value={newPet.testimonies_english || ''}
+                      onChange={(e) => setNewPet({ ...newPet, testimonies_english: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                      rows={2}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-1">Nombre de la familia</label>
+                    <input
+                      type="text"
+                      value={newPet.nombre_familia || ''}
+                      onChange={(e) => setNewPet({ ...newPet, nombre_familia: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-1">Fecha del testimonio</label>
+                    <input
+                      type="date"
+                      value={newPet.fecha_testimonio || ''}
+                      onChange={(e) => setNewPet({ ...newPet, fecha_testimonio: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-1">País</label>
+                    <input
+                      type="text"
+                      value={newPet.pais || ''}
+                      onChange={(e) => setNewPet({ ...newPet, pais: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-1">Ubicación</label>
+                    <input
+                      type="text"
+                      value={newPet.ubicacion || ''}
+                      onChange={(e) => setNewPet({ ...newPet, ubicacion: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-1">Tipo de mascota</label>
+                    <input
+                      type="text"
+                      value={newPet.tipo_mascota || ''}
+                      onChange={(e) => setNewPet({ ...newPet, tipo_mascota: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-1">Raza</label>
+                    <input
+                      type="text"
+                      value={newPet.raza || ''}
+                      onChange={(e) => setNewPet({ ...newPet, raza: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                    />
+                  </div>
+                </>
+              )}
+              <div className="col-span-2 grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                {["image_1", "image_2", "image_3", "image_4", "image_5", "image_6", "image_father_1", "image_father_2", "image_mother_1", "image_mother_2"].map((field) => (
                   <div key={field} className="flex flex-col items-center">
                     <span className="text-xs text-gray-400 mb-1">{field.replace('_', ' ').replace('image', 'Foto').replace('father', 'Padre').replace('mother', 'Madre').replace('  ', ' ')}</span>
                     {newPet[field] ? (
@@ -525,12 +809,27 @@ const AdminPage = () => {
                     ) : (
                       <div className="w-24 h-24 flex items-center justify-center bg-gray-700 rounded-lg border-2 border-gray-600 text-gray-400 mb-2">Sin imagen</div>
                     )}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleImageUpload(e, false, field)}
-                      className="mb-2"
-                    />
+                    <label className="w-full">
+                      <span className="block w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-2 px-2 rounded-lg text-center cursor-pointer transition-colors text-sm mb-1">Seleccionar imagen</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleImageUpload(e, false, field)}
+                        className="hidden"
+                      />
+                    </label>
+                    {/* Nombre del archivo seleccionado */}
+                    {uploadProgress[field] > 0 && uploadProgress[field] < 100 && (
+                      <div className="w-full mt-1">
+                        <div className="h-2 bg-gray-600 rounded-full overflow-hidden">
+                          <div className="h-2 bg-yellow-400" style={{ width: `${uploadProgress[field]}%` }}></div>
+                        </div>
+                        <span className="text-xs text-gray-300">{uploadProgress[field]}%</span>
+                      </div>
+                    )}
+                    {uploadProgress[field] === 100 && (
+                      <span className="text-xs text-green-400 mt-1">¡Imagen subida!</span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -545,6 +844,7 @@ const AdminPage = () => {
                 <button
                   type="submit"
                   className="bg-yellow-500 hover:bg-yellow-600 text-black font-medium py-2 px-4 rounded-lg transition-colors"
+                  disabled={Object.values(uploadProgress).some((p) => p > 0 && p < 100)}
                 >
                   Agregar
                 </button>
@@ -620,6 +920,17 @@ const AdminPage = () => {
                       <span className="text-pink-300">{pet.litters}</span>
                     </li>
                   </ul>
+                  {/* Precios en todas las divisas */}
+                  <div className="w-full flex flex-col gap-1 mb-4">
+                    <span className="text-xs text-gray-400">Precios por país:</span>
+                    <div className="flex flex-wrap gap-2">
+                      {pet.price && <span className="bg-gray-800 text-yellow-400 px-2 py-1 rounded text-xs">USD: ${pet.price}</span>}
+                      {pet.price_canada && <span className="bg-gray-800 text-blue-300 px-2 py-1 rounded text-xs">CAD: ${pet.price_canada}</span>}
+                      {pet.price_costa_rica && <span className="bg-gray-800 text-green-400 px-2 py-1 rounded text-xs">CRC: ₡{pet.price_costa_rica}</span>}
+                      {pet.price_salvador && <span className="bg-gray-800 text-purple-300 px-2 py-1 rounded text-xs">El Salvador: ${pet.price_salvador} SVC</span>}
+                      {pet.price_panama && <span className="bg-gray-800 text-pink-300 px-2 py-1 rounded text-xs">PAB: B/.{pet.price_panama}</span>}
+                    </div>
+                  </div>
                   <div className="w-full flex justify-end mb-4">
                     <span className="text-2xl font-bold text-yellow-400">${pet.price} USD</span>
                   </div>
@@ -659,7 +970,7 @@ const AdminPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                   {/* Galería editable */}
                   <div>
-                    <h4 className="text-lg font-bold text-yellow-500 mb-4">Imágenes del cachorro</h4>
+                    <h4 className="text-lg font-bold text-yellow-500 mb-4">Imágenes</h4>
                     <div className="grid grid-cols-2 gap-4">
                       {["image_1", "image_2", "image_3", "image_4", "image_5", "image_6"].map((field) => (
                         <div key={field} className="flex flex-col items-center">
@@ -704,100 +1015,360 @@ const AdminPage = () => {
                       ))}
                     </div>
                   </div>
-                  {/* Datos generales */}
+                  {/* Datos generales y testimonios */}
                   <div>
                     <h4 className="text-lg font-bold text-yellow-500 mb-4">Datos generales</h4>
                     <div className="space-y-4">
-                    <div>
+                      <div>
                         <label className="block text-sm font-medium text-white mb-1">Nombre</label>
-                      <input
-                        type="text"
-                        value={editingPet.name}
-                        onChange={(e) => setEditingPet({ ...editingPet, name: e.target.value })}
+                        <input
+                          type="text"
+                          maxLength={255}
+                          value={editingPet.name || ''}
+                          onChange={(e) => setEditingPet({ ...editingPet, name: e.target.value })}
                           className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
-                        required
-                      />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-white mb-1">Tamaño</label>
-                      <input
-                        type="text"
-                        value={editingPet.size}
-                        onChange={(e) => setEditingPet({ ...editingPet, size: e.target.value })}
-                          className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
-                        required
-                      />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-white mb-1">Características</label>
-                      <input
-                        type="text"
-                        value={editingPet.characteristics}
-                        onChange={(e) => setEditingPet({ ...editingPet, characteristics: e.target.value })}
-                          className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
-                        required
-                      />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-white mb-1">Peso</label>
-                      <input
-                        type="text"
-                        value={editingPet.weight}
-                        onChange={(e) => setEditingPet({ ...editingPet, weight: e.target.value })}
-                          className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
-                        required
-                      />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium white mb-1">Altura</label>
-                      <input
-                        type="text"
-                        value={editingPet.height}
-                        onChange={(e) => setEditingPet({ ...editingPet, height: e.target.value })}
-                          className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
-                        required
-                      />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium white mb-1">Camadas</label>
-                      <input
-                        type="text"
-                        value={editingPet.litters}
-                        onChange={(e) => setEditingPet({ ...editingPet, litters: e.target.value })}
-                          className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
-                        required
-                      />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium white mb-1">Precio (USD)</label>
-                      <input
-                        type="number"
-                        value={editingPet.price}
-                        onChange={(e) => setEditingPet({ ...editingPet, price: e.target.value })}
-                          className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
-                        required
-                      />
+                          required
+                        />
                       </div>
+                      {activeTab === 'dogs' && (
+                        <div>
+                          <label className="block text-sm font-medium text-white mb-1">Nombre (Inglés)</label>
+                          <input
+                            type="text"
+                            maxLength={255}
+                            value={editingPet.name_en || ''}
+                            onChange={(e) => setEditingPet({ ...editingPet, name_en: e.target.value })}
+                            className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                          />
+                        </div>
+                      )}
+                      <div>
+                        <label className="block text-sm font-medium text-white mb-1">Tamaño</label>
+                        <input
+                          type="text"
+                          maxLength={255}
+                          value={editingPet.size || ''}
+                          onChange={(e) => setEditingPet({ ...editingPet, size: e.target.value })}
+                          className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-white mb-1">Características</label>
+                        <input
+                          type="text"
+                          maxLength={255}
+                          value={editingPet.characteristics || ''}
+                          onChange={(e) => setEditingPet({ ...editingPet, characteristics: e.target.value })}
+                          className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                          required
+                        />
+                      </div>
+                      {activeTab === 'dogs' && (
+                        <div>
+                          <label className="block text-sm font-medium text-white mb-1">Características (Inglés)</label>
+                          <input
+                            type="text"
+                            maxLength={255}
+                            value={editingPet.characteristics_en || ''}
+                            onChange={(e) => setEditingPet({ ...editingPet, characteristics_en: e.target.value })}
+                            className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                          />
+                        </div>
+                      )}
+                      {activeTab === 'cats' && (
+                        <div>
+                          <label className="block text-sm font-medium text-white mb-1">Características (Inglés)</label>
+                          <input
+                            type="text"
+                            maxLength={255}
+                            value={editingPet.characteristics_english || ''}
+                            onChange={(e) => setEditingPet({ ...editingPet, characteristics_english: e.target.value })}
+                            className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                          />
+                        </div>
+                      )}
+                      <div>
+                        <label className="block text-sm font-medium text-white mb-1">Precio (USD)</label>
+                        <input
+                          type="number"
+                          min={0}
+                          step="0.01"
+                          value={editingPet.price || ''}
+                          onChange={(e) => setEditingPet({ ...editingPet, price: e.target.value })}
+                          className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                          required
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-xs font-medium text-white mb-1">Precio Canadá (CAD)</label>
+                          <input
+                            type="number"
+                            min={0}
+                            step="0.01"
+                            value={editingPet.price_canada || ''}
+                            onChange={(e) => setEditingPet({ ...editingPet, price_canada: e.target.value })}
+                            className="w-full px-2 py-1 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-white mb-1">Precio Costa Rica (CRC)</label>
+                          <input
+                            type="number"
+                            min={0}
+                            step="0.01"
+                            value={editingPet.price_costa_rica || ''}
+                            onChange={(e) => setEditingPet({ ...editingPet, price_costa_rica: e.target.value })}
+                            className="w-full px-2 py-1 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-white mb-1">Precio El Salvador (SVC)</label>
+                          <input
+                            type="number"
+                            min={0}
+                            step="0.01"
+                            value={editingPet.price_salvador || ''}
+                            onChange={(e) => setEditingPet({ ...editingPet, price_salvador: e.target.value })}
+                            className="w-full px-2 py-1 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-white mb-1">Precio Panamá (PAB)</label>
+                          <input
+                            type="number"
+                            min={0}
+                            step="0.01"
+                            value={editingPet.price_panama || ''}
+                            onChange={(e) => setEditingPet({ ...editingPet, price_panama: e.target.value })}
+                            className="w-full px-2 py-1 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                          />
+                        </div>
+                      </div>
+                      {activeTab === 'dogs' && (
+                        <>
+                          <div>
+                            <label className="block text-sm font-medium text-white mb-1">Peso</label>
+                            <input
+                              type="text"
+                              maxLength={255}
+                              value={editingPet.weight || ''}
+                              onChange={(e) => setEditingPet({ ...editingPet, weight: e.target.value })}
+                              className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-white mb-1">Altura</label>
+                            <input
+                              type="text"
+                              maxLength={255}
+                              value={editingPet.height || ''}
+                              onChange={(e) => setEditingPet({ ...editingPet, height: e.target.value })}
+                              className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-white mb-1">Camadas</label>
+                            <input
+                              type="number"
+                              min={0}
+                              value={editingPet.litters || ''}
+                              onChange={(e) => setEditingPet({ ...editingPet, litters: e.target.value })}
+                              className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                            />
+                          </div>
+                        </>
+                      )}
+                      {activeTab === 'cats' && (
+                        <>
+                          <div>
+                            <label className="block text-sm font-medium text-white mb-1">Salud General</label>
+                            <input
+                              type="text"
+                              value={editingPet.salud_general || ''}
+                              onChange={(e) => setEditingPet({ ...editingPet, salud_general: e.target.value })}
+                              className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-white mb-1">Salud (Inglés)</label>
+                            <input
+                              type="text"
+                              value={editingPet.salud_english || ''}
+                              onChange={(e) => setEditingPet({ ...editingPet, salud_english: e.target.value })}
+                              className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                            />
+                          </div>
+                        </>
+                      )}
+                      {/* Testimonios para gatos */}
+                      {activeTab === 'cats' && (
+                        <>
+                          <h4 className="text-lg font-bold text-yellow-500 mt-8 mb-2">Testimonio</h4>
+                          <div>
+                            <label className="block text-sm font-medium text-white mb-1">Testimonio</label>
+                            <textarea
+                              value={editingPet.testimonio || ''}
+                              onChange={(e) => setEditingPet({ ...editingPet, testimonio: e.target.value })}
+                              className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                              rows={2}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-white mb-1">Nombre de la familia</label>
+                            <input
+                              type="text"
+                              value={editingPet.nombre_de_la_familia || ''}
+                              onChange={(e) => setEditingPet({ ...editingPet, nombre_de_la_familia: e.target.value })}
+                              className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-white mb-1">Fecha del testimonio</label>
+                            <input
+                              type="date"
+                              value={editingPet.fecha ? editingPet.fecha.substring(0, 10) : ''}
+                              onChange={(e) => setEditingPet({ ...editingPet, fecha: e.target.value })}
+                              className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-white mb-1">País</label>
+                            <input
+                              type="text"
+                              value={editingPet.pais || ''}
+                              onChange={(e) => setEditingPet({ ...editingPet, pais: e.target.value })}
+                              className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-white mb-1">Ubicación</label>
+                            <input
+                              type="text"
+                              value={editingPet.ubicacion || ''}
+                              onChange={(e) => setEditingPet({ ...editingPet, ubicacion: e.target.value })}
+                              className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-white mb-1">Tipo de mascota</label>
+                            <input
+                              type="text"
+                              value={editingPet.tipo_de_mascota || ''}
+                              onChange={(e) => setEditingPet({ ...editingPet, tipo_de_mascota: e.target.value })}
+                              className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-white mb-1">Raza</label>
+                            <input
+                              type="text"
+                              value={editingPet.raza || ''}
+                              onChange={(e) => setEditingPet({ ...editingPet, raza: e.target.value })}
+                              className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                            />
+                          </div>
+                        </>
+                      )}
+                      {/* Testimonios para perros */}
+                      {activeTab === 'dogs' && (
+                        <>
+                          <h4 className="text-lg font-bold text-yellow-500 mt-8 mb-2">Testimonios</h4>
+                          <div>
+                            <label className="block text-sm font-medium text-white mb-1">Testimonio (Español)</label>
+                            <textarea
+                              value={editingPet.testimonies_spanish || ''}
+                              onChange={(e) => setEditingPet({ ...editingPet, testimonies_spanish: e.target.value })}
+                              className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                              rows={2}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-white mb-1">Testimonio (Inglés)</label>
+                            <textarea
+                              value={editingPet.testimonies_english || ''}
+                              onChange={(e) => setEditingPet({ ...editingPet, testimonies_english: e.target.value })}
+                              className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                              rows={2}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-white mb-1">Nombre de la familia</label>
+                            <input
+                              type="text"
+                              value={editingPet.nombre_familia || ''}
+                              onChange={(e) => setEditingPet({ ...editingPet, nombre_familia: e.target.value })}
+                              className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-white mb-1">Fecha del testimonio</label>
+                            <input
+                              type="date"
+                              value={editingPet.fecha_testimonio ? editingPet.fecha_testimonio.substring(0, 10) : ''}
+                              onChange={(e) => setEditingPet({ ...editingPet, fecha_testimonio: e.target.value })}
+                              className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-white mb-1">País</label>
+                            <input
+                              type="text"
+                              value={editingPet.pais || ''}
+                              onChange={(e) => setEditingPet({ ...editingPet, pais: e.target.value })}
+                              className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-white mb-1">Ubicación</label>
+                            <input
+                              type="text"
+                              value={editingPet.ubicacion || ''}
+                              onChange={(e) => setEditingPet({ ...editingPet, ubicacion: e.target.value })}
+                              className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-white mb-1">Tipo de mascota</label>
+                            <input
+                              type="text"
+                              value={editingPet.tipo_mascota || ''}
+                              onChange={(e) => setEditingPet({ ...editingPet, tipo_mascota: e.target.value })}
+                              className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-white mb-1">Raza</label>
+                            <input
+                              type="text"
+                              value={editingPet.raza || ''}
+                              onChange={(e) => setEditingPet({ ...editingPet, raza: e.target.value })}
+                              className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-900"
+                            />
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
                 <div className="flex justify-end gap-4 mt-8 border-t pt-6">
-                      <button
-                        type="button"
-                        onClick={() => setEditingPet(null)}
+                  <button
+                    type="button"
+                    onClick={() => setEditingPet(null)}
                     className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-8 rounded-lg transition-colors"
-                      >
-                        Cancelar
-                      </button>
-                      <button
-                        type="submit"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
                     className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-2 px-8 rounded-lg transition-colors"
-                      >
-                        Guardar
-                      </button>
-                    </div>
-                  </form>
-              </div>
+                  >
+                    Guardar
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         )}
       </div>

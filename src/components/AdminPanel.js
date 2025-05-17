@@ -25,7 +25,7 @@ const AdminPanel = ({ onLogout }) => {
   const fetchPets = async () => {
     try {
       setLoading(true);
-      const table = activeTab === 'dogs' ? 'dogs' : 'cats';
+      const table = activeTab === 'dogs' ? 'dogs_new' : 'cats_new';
       const { data, error } = await supabase
         .from(table)
         .select('*')
@@ -43,7 +43,7 @@ const AdminPanel = ({ onLogout }) => {
   const handleAddPet = async (e) => {
     e.preventDefault();
     try {
-      const table = activeTab === 'dogs' ? 'dogs' : 'cats';
+      const table = activeTab === 'dogs' ? 'dogs_new' : 'cats_new';
       const { error } = await supabase
         .from(table)
         .insert([newPet]);
@@ -70,7 +70,7 @@ const AdminPanel = ({ onLogout }) => {
   const handleDeletePet = async (id) => {
     if (window.confirm('¿Estás seguro de que deseas eliminar esta mascota?')) {
       try {
-        const table = activeTab === 'dogs' ? 'dogs' : 'cats';
+        const table = activeTab === 'dogs' ? 'dogs_new' : 'cats_new';
         const { error } = await supabase
           .from(table)
           .delete()
@@ -303,7 +303,17 @@ const AdminPanel = ({ onLogout }) => {
                   <div>Peso: {pet.weight}</div>
                   <div>Altura: {pet.height}</div>
                   <div>Camadas: {pet.litters}</div>
-                  <div>Precio: ${pet.price} USD</div>
+                </div>
+                {/* Precios en todas las divisas */}
+                <div className="flex flex-col gap-1 mb-2">
+                  <span className="text-xs text-gray-400">Precios por país:</span>
+                  <div className="flex flex-wrap gap-2">
+                    {pet.price && <span className="bg-gray-800 text-yellow-400 px-2 py-1 rounded text-xs">USD: ${pet.price}</span>}
+                    {pet.price_canada && <span className="bg-gray-800 text-blue-300 px-2 py-1 rounded text-xs">CAD: ${pet.price_canada}</span>}
+                    {pet.price_costa_rica && <span className="bg-gray-800 text-green-400 px-2 py-1 rounded text-xs">CRC: ₡{pet.price_costa_rica}</span>}
+                    {pet.price_salvador && <span className="bg-gray-800 text-purple-300 px-2 py-1 rounded text-xs">El Salvador: ${pet.price_salvador} SVC</span>}
+                    {pet.price_panama && <span className="bg-gray-800 text-pink-300 px-2 py-1 rounded text-xs">PAB: B/.{pet.price_panama}</span>}
+                  </div>
                 </div>
                 <button
                   onClick={() => handleDeletePet(pet.id)}
