@@ -30,6 +30,7 @@ export const CurrencyProvider = ({ children }) => {
 
         const detectedCurrency = countryToCurrency[country];
         if (detectedCurrency) {
+          console.log('CurrencyContext - Detected Currency:', detectedCurrency);
           setSelectedCurrency(detectedCurrency);
         }
       } catch (error) {
@@ -80,10 +81,16 @@ export const CurrencyProvider = ({ children }) => {
     return selectedCurrency;
   };
 
+  // Wrap setSelectedCurrency to add logging
+  const updateSelectedCurrency = (newCurrency) => {
+    console.log('CurrencyContext - Updating Currency:', newCurrency);
+    setSelectedCurrency(newCurrency);
+  };
+
   return (
     <CurrencyContext.Provider value={{
       selectedCurrency,
-      setSelectedCurrency,
+      setSelectedCurrency: updateSelectedCurrency,
       getPriceByCurrency,
       getDisplayCurrency,
       isLoading

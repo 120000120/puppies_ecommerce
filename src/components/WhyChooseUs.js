@@ -1,11 +1,19 @@
-const WhyChooseUs = () => {
+import { useCurrency } from '../context/CurrencyContext';
+
+const WhyChooseUs = ({ isEnglish }) => {
+  console.log('WhyChooseUs - Is English:', isEnglish);
+
   return (
     <section className="py-20 bg-gray-black text-white bg-gradient-to-b from-black to-gray-900">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-yellow-400 mb-4">¿Por qué elegirnos?</h2>
+          <h2 className="text-4xl font-bold text-yellow-400 mb-4">
+            {isEnglish ? 'Why Choose Us?' : '¿Por qué elegirnos?'}
+          </h2>
           <p className="text-gray-300 max-w-2xl mx-auto text-lg">
-            En Best Family Puppies nos dedicamos a criar perros saludables y felices para familias amorosas.
+            {isEnglish 
+              ? 'At Best Family Puppies, we are dedicated to raising healthy and happy dogs for loving families.'
+              : 'En Best Family Puppies nos dedicamos a criar perros saludables y felices para familias amorosas.'}
           </p>
         </div>
         
@@ -20,9 +28,13 @@ const WhyChooseUs = () => {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white mb-3">Salud Garantizada</h3>
+                  <h3 className="text-xl font-bold text-white mb-3">
+                    {isEnglish ? 'Guaranteed Health' : 'Salud Garantizada'}
+                  </h3>
                   <p className="text-gray-300 leading-relaxed">
-                    Todos nuestros cachorros reciben atención veterinaria completa, vacunas y desparasitación antes de ir a su nuevo hogar.
+                    {isEnglish
+                      ? 'All our puppies receive complete veterinary care, vaccinations, and deworming before going to their new home.'
+                      : 'Todos nuestros cachorros reciben atención veterinaria completa, vacunas y desparasitación antes de ir a su nuevo hogar.'}
                   </p>
                 </div>
               </div>
@@ -36,9 +48,13 @@ const WhyChooseUs = () => {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white mb-3">Crianza Responsable</h3>
+                  <h3 className="text-xl font-bold text-white mb-3">
+                    {isEnglish ? 'Responsible Breeding' : 'Crianza Responsable'}
+                  </h3>
                   <p className="text-gray-300 leading-relaxed">
-                    Nuestros perros son criados en un ambiente familiar con amor, socialización temprana y los mejores cuidados.
+                    {isEnglish
+                      ? 'Our dogs are raised in a family environment with love, early socialization, and the best care.'
+                      : 'Nuestros perros son criados en un ambiente familiar con amor, socialización temprana y los mejores cuidados.'}
                   </p>
                 </div>
               </div>
@@ -52,9 +68,13 @@ const WhyChooseUs = () => {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white mb-3">Soporte Continuo</h3>
+                  <h3 className="text-xl font-bold text-white mb-3">
+                    {isEnglish ? 'Continuous Support' : 'Soporte Continuo'}
+                  </h3>
                   <p className="text-gray-300 leading-relaxed">
-                    Ofrecemos asesoramiento y apoyo después de la adopción para asegurar que tu cachorro se adapte perfectamente a su nuevo hogar.
+                    {isEnglish
+                      ? 'We offer advice and support after adoption to ensure your puppy adapts perfectly to their new home.'
+                      : 'Ofrecemos asesoramiento y apoyo después de la adopción para asegurar que tu cachorro se adapte perfectamente a su nuevo hogar.'}
                   </p>
                 </div>
               </div>

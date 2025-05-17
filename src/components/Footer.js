@@ -2,11 +2,14 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AdminLogin from './AdminLogin';
 import AdminPanel from './AdminPanel';
+import { useCurrency } from '../context/CurrencyContext';
 
 const Footer = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
+  const { selectedCurrency } = useCurrency();
+  const isEnglish = selectedCurrency === 'usd' || selectedCurrency === 'cad';
 
   const handleLogin = () => {
     setIsLoggedIn(true);
@@ -26,7 +29,7 @@ const Footer = () => {
     <footer className="bg-gray-800 text-white py-8">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Logo y descripción */}
+          {/* Logo and description */}
           <div className="space-y-4">
             <Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="inline-block">
               <img 
@@ -36,21 +39,24 @@ const Footer = () => {
               />
             </Link>
             <p className="text-gray-400 text-sm">
-              Tu destino confiable para encontrar el compañero perfecto. Cachorros de raza pura, 
-              criados con amor y cuidado profesional.
+              {isEnglish 
+                ? 'Your trusted destination for finding the perfect companion. Purebred puppies, raised with love and professional care.'
+                : 'Tu destino confiable para encontrar el compañero perfecto. Cachorros de raza pura, criados con amor y cuidado profesional.'}
             </p>
           </div>
 
-          {/* Enlaces rápidos */}
+          {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-yellow-400">Enlaces Rápidos</h3>
+            <h3 className="text-lg font-semibold mb-4 text-yellow-400">
+              {isEnglish ? 'Quick Links' : 'Enlaces Rápidos'}
+            </h3>
             <ul className="space-y-2">
               <li>
                 <button 
                   onClick={() => handleNavigation('/catalogo')} 
                   className="text-gray-400 hover:text-yellow-400 transition-colors"
                 >
-                  Catálogo de Perros
+                  {isEnglish ? 'Dog Catalog' : 'Catálogo de Perros'}
                 </button>
               </li>
               <li>
@@ -58,7 +64,7 @@ const Footer = () => {
                   onClick={() => handleNavigation('/catalogo-gatos')} 
                   className="text-gray-400 hover:text-yellow-400 transition-colors"
                 >
-                  Catálogo de Gatos
+                  {isEnglish ? 'Cat Catalog' : 'Catálogo de Gatos'}
                 </button>
               </li>
               <li>
@@ -66,7 +72,7 @@ const Footer = () => {
                   onClick={() => handleNavigation('/contacto')} 
                   className="text-gray-400 hover:text-yellow-400 transition-colors"
                 >
-                  Contacto
+                  {isEnglish ? 'Contact' : 'Contacto'}
                 </button>
               </li>
               <li>
@@ -74,15 +80,17 @@ const Footer = () => {
                   onClick={() => handleNavigation('/admin')} 
                   className="text-gray-400 hover:text-yellow-400 transition-colors"
                 >
-                  Panel de Admin
+                  {isEnglish ? 'Admin Panel' : 'Panel de Admin'}
                 </button>
               </li>
             </ul>
           </div>
 
-          {/* Redes sociales */}
+          {/* Social Media */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-yellow-400">Síguenos</h3>
+            <h3 className="text-lg font-semibold mb-4 text-yellow-400">
+              {isEnglish ? 'Follow Us' : 'Síguenos'}
+            </h3>
             <div className="flex space-x-4">
               <a
                 href="https://www.facebook.com/bestfamilypuppiesus/"
@@ -120,7 +128,7 @@ const Footer = () => {
 
         {/* Copyright */}
         <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400 text-sm">
-          <p>&copy; {new Date().getFullYear()} Best Family Puppies. Todos los derechos reservados.</p>
+          <p>&copy; {new Date().getFullYear()} Best Family Puppies. {isEnglish ? 'All rights reserved.' : 'Todos los derechos reservados.'}</p>
         </div>
       </div>
 

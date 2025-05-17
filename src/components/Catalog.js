@@ -113,87 +113,97 @@ const Catalog = () => {
   return (
     <>
       <CatalogHero />
-      <section id="catalog" className="py-16 bg-black text-white">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center gap-8 mb-12">
-            <div className="text-center md:text-left flex-1">
+    <section id="catalog" className="py-16 bg-black text-white">
+      <div className="container mx-auto px-4">
+        <div className="flex flex-col md:flex-row items-center gap-8 mb-12">
+          <div className="text-center md:text-left flex-1">
               <h2 className="text-3xl font-bold text-yellow-400 mb-4">
                 {isEnglish ? 'Our Puppies' : 'Nuestros Cachorros'}
               </h2>
-              <p className="text-gray-300">
+            <p className="text-gray-300">
                 {isEnglish 
                   ? 'Explore our wide selection of available puppies to find your perfect companion.'
                   : 'Explora nuestra amplia selección de cachorros disponibles para encontrar tu compañero perfecto.'}
-              </p>
+            </p>
+          </div>
+          
+          {/* Banner Image */}
+        </div>
+        
+        <div className="bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label htmlFor="search" className="block text-sm font-medium text-gray-300 mb-1">
+                {isEnglish ? 'Search' : 'Buscar'}
+              </label>
+              <input
+                type="text"
+                id="search"
+                placeholder={isEnglish ? "Search by name or characteristics..." : "Buscar por nombre o características..."}
+                className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
             
-            {/* Banner Image */}
-          </div>
-          
-          <div className="bg-gray-800 rounded-xl shadow-md p-6 mb-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label htmlFor="search" className="block text-sm font-medium text-gray-300 mb-1">Buscar</label>
-                <input
-                  type="text"
-                  id="search"
-                  placeholder="Buscar por nombre o características..."
-                  className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              
-              <div>
-                <label htmlFor="size" className="block text-sm font-medium text-gray-300 mb-1">Tamaño</label>
-                <select
-                  id="size"
-                  className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
-                  value={selectedSize}
-                  onChange={(e) => setSelectedSize(e.target.value)}
-                >
-                  <option value="">Todos los tamaños</option>
-                  <option value="Small breeds">Pequeño</option>
-                  <option value="Medium breeds">Mediano</option>
-                  <option value="Large breeds">Grande</option>
-                  <option value="Exotic breeds">Exótico</option>
-                </select>
-              </div>
-              
-              <div>
-                <label htmlFor="price" className="block text-sm font-medium text-gray-300 mb-1">Rango de precio</label>
-                <select
-                  id="price"
-                  className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
-                  value={priceRange}
-                  onChange={(e) => setPriceRange(e.target.value)}
-                >
-                  <option value="">Todos los precios</option>
-                  <option value="low">Hasta $3,500</option>
-                  <option value="medium">$3,501 - $5,000</option>
-                  <option value="high">Más de $5,000</option>
-                </select>
-              </div>
+            <div>
+              <label htmlFor="size" className="block text-sm font-medium text-gray-300 mb-1">
+                {isEnglish ? 'Size' : 'Tamaño'}
+              </label>
+              <select
+                id="size"
+                className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                value={selectedSize}
+                onChange={(e) => setSelectedSize(e.target.value)}
+              >
+                <option value="">{isEnglish ? 'All sizes' : 'Todos los tamaños'}</option>
+                <option value="Small breeds">{isEnglish ? 'Small' : 'Pequeño'}</option>
+                <option value="Medium breeds">{isEnglish ? 'Medium' : 'Mediano'}</option>
+                <option value="Large breeds">{isEnglish ? 'Large' : 'Grande'}</option>
+                <option value="Exotic breeds">{isEnglish ? 'Exotic' : 'Exótico'}</option>
+              </select>
+            </div>
+            
+            <div>
+              <label htmlFor="price" className="block text-sm font-medium text-gray-300 mb-1">
+                {isEnglish ? 'Price Range' : 'Rango de precio'}
+              </label>
+              <select
+                id="price"
+                className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                value={priceRange}
+                onChange={(e) => setPriceRange(e.target.value)}
+              >
+                <option value="">{isEnglish ? 'All prices' : 'Todos los precios'}</option>
+                <option value="low">{isEnglish ? 'Up to $3,500' : 'Hasta $3,500'}</option>
+                <option value="medium">{isEnglish ? '$3,501 - $5,000' : '$3,501 - $5,000'}</option>
+                <option value="high">{isEnglish ? 'Over $5,000' : 'Más de $5,000'}</option>
+              </select>
             </div>
           </div>
-          
-          {filteredDogs.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredDogs.map(dog => (
-                <DogCard key={dog.id} dog={dog} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <svg className="w-16 h-16 mx-auto text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              <h3 className="text-xl font-medium text-gray-400 mb-2">No se encontraron resultados</h3>
-              <p className="text-gray-500">Intenta con otros criterios de búsqueda</p>
-            </div>
-          )}
         </div>
-      </section>
+        
+        {filteredDogs.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredDogs.map(dog => (
+              <DogCard key={dog.id} dog={dog} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <svg className="w-16 h-16 mx-auto text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h3 className="text-xl font-medium text-gray-400 mb-2">
+              {isEnglish ? 'No results found' : 'No se encontraron resultados'}
+            </h3>
+            <p className="text-gray-500">
+              {isEnglish ? 'Try different search criteria' : 'Intenta con otros criterios de búsqueda'}
+            </p>
+          </div>
+        )}
+      </div>
+    </section>
     </>
   );
 };

@@ -117,7 +117,7 @@ const Home = () => {
         buttonText={isEnglish ? 'See Puppies' : 'Ver Cachorros'}
       />
 
-      <WhyChooseUs />
+      <WhyChooseUs isEnglish={isEnglish} />
 
       {/* Testimonials Section */}
       <section className="py-20 bg-gradient-to-b from-gray-900 to-black relative overflow-hidden">
@@ -199,7 +199,7 @@ const Home = () => {
         </svg>
       </div> */}
       </section>
-      <VideoSection />
+      <VideoSection isEnglish={isEnglish} />
       
       {/* Random Dogs Section */}
       <section className="py-16 bg-gray-black text-white ">
@@ -242,7 +242,7 @@ const Home = () => {
       </section>
 
       
-      <CallToAction />
+      <CallToAction isEnglish={isEnglish} />
     </main>
   );
 };
