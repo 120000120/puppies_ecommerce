@@ -16,7 +16,9 @@ const DeliveryConditions = ({ isCat = false }) => {
         onClick={() => setIsOpen(!isOpen)}
         className="w-full px-6 py-4 text-left bg-gray-700 hover:bg-gray-600 transition-colors duration-200 flex justify-between items-center"
       >
-        <span className="text-lg font-semibold text-white">Condiciones de entrega</span>
+        <span className="text-lg font-semibold text-white">
+          {selectedCurrency === 'usd' || selectedCurrency === 'cad' ? 'Delivery Conditions' : 'Condiciones de entrega'}
+        </span>
         <svg
           className={`w-6 h-6 text-yellow-400 transform transition-transform duration-200 ${
             isOpen ? 'rotate-180' : ''
