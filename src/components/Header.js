@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCurrency } from '../context/CurrencyContext';
 
 const Header = () => {
@@ -16,6 +16,24 @@ const Header = () => {
     { code: 'nio', name: isEnglish ? 'El Salvador' : 'El Salvador', flag: 'https://flagcdn.com/w20/sv.png' },
     { code: 'pab', name: 'Panamá', flag: 'https://flagcdn.com/w20/pa.png' }
   ];
+
+  useEffect(() => {
+    const detectCountry = async () => {
+      try {
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+        
+        // Si la IP es de El Salvador, establecer la moneda a NIO
+        if (data.country_code === 'SV') {
+          setSelectedCurrency('nio');
+        }
+      } catch (error) {
+        console.error('Error detecting country:', error);
+      }
+    };
+
+    detectCountry();
+  }, [setSelectedCurrency]);
 
   const selectedCurrencyInfo = currencies.find(c => c.code === selectedCurrency);
 
