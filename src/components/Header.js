@@ -7,14 +7,15 @@ const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { selectedCurrency, setSelectedCurrency, isLoading } = useCurrency();
 
-  const isEnglish = selectedCurrency === 'usd' || selectedCurrency === 'cad';
+  const isEnglish = selectedCurrency === 'usd' || selectedCurrency === 'cad' || selectedCurrency === 'pr_usd';
 
   const currencies = [
     { code: 'usd', name: isEnglish ? 'United States' : 'Estados Unidos', flag: 'https://flagcdn.com/w20/us.png' },
     { code: 'cad', name: isEnglish ? 'Canada' : 'Canadá', flag: 'https://flagcdn.com/w20/ca.png' },
     { code: 'crc', name: 'Costa Rica', flag: 'https://flagcdn.com/w20/cr.png' },
     { code: 'nio', name: isEnglish ? 'El Salvador' : 'El Salvador', flag: 'https://flagcdn.com/w20/sv.png' },
-    { code: 'pab', name: 'Panamá', flag: 'https://flagcdn.com/w20/pa.png' }
+    { code: 'pab', name: 'Panamá', flag: 'https://flagcdn.com/w20/pa.png' },
+    { code: 'pr_usd', name: isEnglish ? 'Puerto Rico' : 'Puerto Rico', flag: 'https://flagcdn.com/w20/pr.png' }
   ];
 
   useEffect(() => {
@@ -26,6 +27,10 @@ const Header = () => {
         // Si la IP es de El Salvador, establecer la moneda a NIO
         if (data.country_code === 'SV') {
           setSelectedCurrency('nio');
+        }
+        // Si la IP es de Puerto Rico, establecer la moneda a PR_USD
+        else if (data.country_code === 'PR') {
+          setSelectedCurrency('pr_usd');
         }
       } catch (error) {
         console.error('Error detecting country:', error);

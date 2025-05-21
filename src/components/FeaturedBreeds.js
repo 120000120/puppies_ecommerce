@@ -35,19 +35,21 @@ const FeaturedBreeds = () => {
     const displayCurrency = getDisplayCurrency(dog);
     const currencyInfo = getCurrencyInfo(displayCurrency);
 
+    // Use USD formatting for Puerto Rico
+    const formatCurrency = displayCurrency === 'pr_usd' ? 'usd' : displayCurrency;
+    const locale = formatCurrency === 'usd' ? 'en-US' : 
+                  formatCurrency === 'cad' ? 'en-CA' : 
+                  formatCurrency === 'crc' ? 'es-CR' :
+                  formatCurrency === 'nio' ? 'es-NI' :
+                  'es-PA';
+
     return {
-      formattedPrice: new Intl.NumberFormat(
-        displayCurrency === 'usd' ? 'en-US' : 
-        displayCurrency === 'cad' ? 'en-CA' : 
-        displayCurrency === 'crc' ? 'es-CR' :
-        displayCurrency === 'nio' ? 'es-NI' :
-        'es-PA', {
-          style: 'currency',
-          currency: displayCurrency.toUpperCase(),
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 0
-        }
-      ).format(price),
+      formattedPrice: new Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency: formatCurrency.toUpperCase(),
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(price),
       currencyInfo
     };
   };

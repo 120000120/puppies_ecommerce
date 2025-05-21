@@ -57,6 +57,8 @@ const CatCard = ({ cat }) => {
       switch (currency) {
         case 'usd':
           return { country: isEnglish ? 'United States' : 'Estados Unidos', symbol: 'USD' };
+        case 'pr_usd':
+          return { country: 'Puerto Rico', symbol: 'USD' };
         case 'cad':
           return { country: isEnglish ? 'Canada' : 'Canadá', symbol: 'CAD' };
         case 'crc':
@@ -82,28 +84,26 @@ const CatCard = ({ cat }) => {
   };
 
   const formatPrice = (price) => {
-    const formattedPrice = new Intl.NumberFormat(
-      displayCurrency === 'usd' ? 'en-US' : 
-      displayCurrency === 'cad' ? 'en-CA' : 
-      displayCurrency === 'crc' ? 'es-CR' :
-      displayCurrency === 'nio' ? 'es-NI' :
-      'es-PA', {
-        style: 'currency',
-        currency: displayCurrency.toUpperCase(),
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      }
-    ).format(price);
+    // Use USD formatting for Puerto Rico
+    const formatCurrency = displayCurrency === 'pr_usd' ? 'usd' : displayCurrency;
+    const locale = formatCurrency === 'usd' ? 'en-US' : 
+                  formatCurrency === 'cad' ? 'en-CA' : 
+                  formatCurrency === 'crc' ? 'es-CR' :
+                  formatCurrency === 'nio' ? 'es-NI' :
+                  'es-PA';
+
+    const formattedPrice = new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: formatCurrency.toUpperCase(),
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(price);
     
     console.log('CatCard - Formatted price:', JSON.stringify({
       originalPrice: price,
       formattedPrice,
-      currency: displayCurrency.toUpperCase(),
-      locale: displayCurrency === 'usd' ? 'en-US' : 
-              displayCurrency === 'cad' ? 'en-CA' : 
-              displayCurrency === 'crc' ? 'es-CR' :
-              displayCurrency === 'nio' ? 'es-NI' :
-              'es-PA'
+      currency: formatCurrency.toUpperCase(),
+      locale
     }, null, 2));
     return formattedPrice;
   };

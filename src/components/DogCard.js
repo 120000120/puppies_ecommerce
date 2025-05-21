@@ -27,12 +27,13 @@ const DogCard = ({ dog }) => {
     image_father_2: dog.image_father_2
   }, null, 2));
   
-  const { getDisplayCurrency } = useCurrency();
+  const { getPriceByCurrency, getDisplayCurrency, selectedCurrency } = useCurrency();
   const displayCurrency = getDisplayCurrency(dog);
-  const isEnglish = displayCurrency === 'usd' || displayCurrency === 'cad';
+  const isEnglish = selectedCurrency === 'usd' || selectedCurrency === 'cad';
 
   console.log('DogCard - Initial currency check:', JSON.stringify({
     displayCurrency,
+    selectedCurrency,
     isEnglish,
     price_canada: dog.price_canada,
     price_usd: dog.price_usd
@@ -69,6 +70,7 @@ const DogCard = ({ dog }) => {
 
   console.log('DogCard - Currency Info:', JSON.stringify({
     displayCurrency,
+    selectedCurrency,
     isEnglish,
     usdPrice: dog.price_usd,
     cadPrice: dog.price_canada,
@@ -86,6 +88,7 @@ const DogCard = ({ dog }) => {
     const price = (() => {
       switch (displayCurrency) {
         case 'usd':
+        case 'pr_usd':
           console.log('DogCard - Using USD price from dogs_new:', JSON.stringify({
             price: dog.price_usd,
             type: typeof dog.price_usd,
@@ -152,9 +155,11 @@ const DogCard = ({ dog }) => {
 
   const getCurrencyInfo = (currency) => {
     const info = (() => {
-      switch (currency) {
+      switch (selectedCurrency) {
         case 'usd':
           return { country: isEnglish ? 'United States' : 'Estados Unidos', symbol: 'USD' };
+        case 'pr_usd':
+          return { country: 'Puerto Rico', symbol: 'USD' };
         case 'cad':
           return { country: isEnglish ? 'Canada' : 'Canadá', symbol: 'CAD' };
         case 'crc':
@@ -170,6 +175,7 @@ const DogCard = ({ dog }) => {
     
     console.log('DogCard - Currency info:', JSON.stringify({
       ...info,
+      selectedCurrency,
       price: currency === 'cad' ? dog.price_canada : 
              currency === 'crc' ? dog.price_costa_rica :
              currency === 'nio' ? dog.price_salvador :
@@ -180,28 +186,26 @@ const DogCard = ({ dog }) => {
   };
 
   const formatPrice = (price) => {
-    const formattedPrice = new Intl.NumberFormat(
-      displayCurrency === 'usd' ? 'en-US' : 
-      displayCurrency === 'cad' ? 'en-CA' : 
-      displayCurrency === 'crc' ? 'es-CR' :
-      displayCurrency === 'nio' ? 'es-NI' :
-      'es-PA', {
-        style: 'currency',
-        currency: displayCurrency.toUpperCase(),
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      }
-    ).format(price);
+    // Use USD formatting for Puerto Rico
+    const formatCurrency = displayCurrency === 'pr_usd' ? 'usd' : displayCurrency;
+    const locale = formatCurrency === 'usd' ? 'en-US' : 
+                  formatCurrency === 'cad' ? 'en-CA' : 
+                  formatCurrency === 'crc' ? 'es-CR' :
+                  formatCurrency === 'nio' ? 'es-NI' :
+                  'es-PA';
+
+    const formattedPrice = new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: formatCurrency.toUpperCase(),
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(price);
     
     console.log('DogCard - Formatted price:', JSON.stringify({
       originalPrice: price,
       formattedPrice,
-      currency: displayCurrency.toUpperCase(),
-      locale: displayCurrency === 'usd' ? 'en-US' : 
-              displayCurrency === 'cad' ? 'en-CA' : 
-              displayCurrency === 'crc' ? 'es-CR' :
-              displayCurrency === 'nio' ? 'es-NI' :
-              'es-PA'
+      currency: formatCurrency.toUpperCase(),
+      locale
     }, null, 2));
     return formattedPrice;
   };

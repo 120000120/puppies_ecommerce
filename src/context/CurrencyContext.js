@@ -25,7 +25,8 @@ export const CurrencyProvider = ({ children }) => {
           'CA': 'cad',
           'PA': 'pab',
           'NI': 'nio',
-          'CR': 'crc'
+          'CR': 'crc',
+          'PR': 'pr_usd'
         };
 
         const detectedCurrency = countryToCurrency[country];
@@ -50,6 +51,7 @@ export const CurrencyProvider = ({ children }) => {
 
     const priceMap = {
       usd: pet.price,
+      pr_usd: pet.price, // Puerto Rico uses USD prices
       cad: pet.price_canada,
       pab: pet.price_panama,
       nio: pet.price_salvador,
@@ -66,6 +68,11 @@ export const CurrencyProvider = ({ children }) => {
     if (selectedCurrency === 'crc') {
       const price = getPriceByCurrency(pet);
       return price > 9999 ? 'crc' : 'usd';
+    }
+
+    // Puerto Rico usa USD para mostrar precios
+    if (selectedCurrency === 'pr_usd') {
+      return 'usd';
     }
 
     return selectedCurrency;

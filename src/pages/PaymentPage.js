@@ -213,6 +213,7 @@ function PaymentPage() {
     if (!pet) return 0;
     switch (code) {
       case 'usd':
+      case 'pr_usd': // Puerto Rico uses USD prices
         return pet.price_usd || pet.price;
       case 'cad':
         return pet.price_canada;
@@ -231,6 +232,8 @@ function PaymentPage() {
     switch (currency) {
       case 'usd':
         return { country: 'United States', symbol: 'USD' };
+      case 'pr_usd':
+        return { country: 'Puerto Rico', symbol: 'USD' };
       case 'cad':
         return { country: 'Canada', symbol: 'CAD' };
       case 'crc':
@@ -242,6 +245,23 @@ function PaymentPage() {
       default:
         return { country: 'United States', symbol: 'USD' };
     }
+  };
+
+  const formatPrice = (price, currency) => {
+    // Use USD formatting for Puerto Rico
+    const formatCurrency = currency === 'pr_usd' ? 'usd' : currency;
+    const locale = formatCurrency === 'usd' ? 'en-US' : 
+                  formatCurrency === 'cad' ? 'en-CA' : 
+                  formatCurrency === 'crc' ? 'es-CR' :
+                  formatCurrency === 'nio' ? 'es-NI' :
+                  'es-PA';
+
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: formatCurrency.toUpperCase(),
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(price);
   };
 
   return (
@@ -343,16 +363,7 @@ function PaymentPage() {
                       {getCountryAndCurrency(selectedCurrency).country} - {getCountryAndCurrency(selectedCurrency).symbol}
                     </span>
                     <span className="text-xl font-bold text-yellow-400">
-                      {new Intl.NumberFormat(selectedCurrency === 'usd' ? 'en-US' : 
-                        selectedCurrency === 'cad' ? 'en-CA' : 
-                        selectedCurrency === 'crc' ? 'es-CR' :
-                        selectedCurrency === 'nio' ? 'es-NI' :
-                        'es-PA', {
-                        style: 'currency',
-                        currency: selectedCurrency.toUpperCase(),
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0
-                      }).format(price)}
+                      {formatPrice(price, selectedCurrency)}
                     </span>
                   </div>
                 </div>
