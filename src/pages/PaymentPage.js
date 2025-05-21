@@ -157,10 +157,26 @@ function PaymentPage() {
         })
       });
 
-      const session = await response.json();
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Server response:', errorText);
+        throw new Error(`Server error: ${response.status} ${response.statusText}`);
+      }
+
+      let session;
+      try {
+        session = await response.json();
+      } catch (error) {
+        console.error('Error parsing JSON:', error);
+        throw new Error('Invalid server response');
+      }
       
       if (session.error) {
         throw new Error(session.error.message);
+      }
+
+      if (!session.id) {
+        throw new Error('No session ID received from server');
       }
 
       const result = await stripe.redirectToCheckout({
@@ -171,8 +187,8 @@ function PaymentPage() {
         throw new Error(result.error.message);
       }
     } catch (error) {
-      console.error('Error:', error);
-      setStripeError(error.message);
+      console.error('Payment error:', error);
+      setStripeError(error.message || 'An error occurred during payment processing');
     } finally {
       setIsLoading(false);
     }
