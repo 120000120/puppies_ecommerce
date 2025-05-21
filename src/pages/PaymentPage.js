@@ -121,27 +121,39 @@ function PaymentPage() {
 
     try {
       const stripe = await stripePromise;
+      if (!stripe) {
+        throw new Error('Stripe failed to initialize');
+      }
+
       const pet = dog || cat;
       const price = getPriceForCurrency(pet, selectedCurrency);
       
-      const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+      // Use 'usd' for Stripe when currency is 'pr_usd'
+      const stripeCurrency = selectedCurrency === 'pr_usd' ? 'usd' : selectedCurrency;
+      
+      const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': `Bearer ${process.env.REACT_APP_STRIPE_SECRET_KEY}`
+          'Content-Type': 'application/json',
         },
-        body: new URLSearchParams({
-          'payment_method_types[]': 'card',
-          'line_items[0][price_data][currency]': selectedCurrency,
-          'line_items[0][price_data][product_data][name]': getDisplayName(pet),
-          'line_items[0][price_data][product_data][description]': getDisplayCharacteristics(pet),
-          'line_items[0][price_data][product_data][images][]': pet.image_1,
-          'line_items[0][price_data][unit_amount]': Math.round(price * 100),
-          'line_items[0][quantity]': '1',
-          'mode': 'payment',
-          'success_url': `${window.location.origin}/success?success=true`,
-          'cancel_url': `${window.location.origin}/cancel`,
-          'customer_email': 'test@example.com'
+        body: JSON.stringify({
+          payment_method_types: ['card'],
+          line_items: [{
+            price_data: {
+              currency: stripeCurrency,
+              product_data: {
+                name: getDisplayName(pet),
+                description: getDisplayCharacteristics(pet),
+                images: [pet.image_1],
+              },
+              unit_amount: Math.round(price * 100),
+            },
+            quantity: 1,
+          }],
+          mode: 'payment',
+          success_url: `${window.location.origin}/success?success=true`,
+          cancel_url: `${window.location.origin}/cancel`,
+          customer_email: 'test@example.com'
         })
       });
 

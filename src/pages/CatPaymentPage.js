@@ -107,6 +107,9 @@ function CatPaymentPage() {
       const stripe = await stripePromise;
       const price = getPriceForCurrency(cat, selectedCurrency);
       
+      // Use 'usd' for Stripe when currency is 'pr_usd'
+      const stripeCurrency = selectedCurrency === 'pr_usd' ? 'usd' : selectedCurrency;
+      
       const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
         method: 'POST',
         headers: {
@@ -115,7 +118,7 @@ function CatPaymentPage() {
         },
         body: new URLSearchParams({
           'payment_method_types[]': 'card',
-          'line_items[0][price_data][currency]': selectedCurrency,
+          'line_items[0][price_data][currency]': stripeCurrency,
           'line_items[0][price_data][product_data][name]': getDisplayName(cat),
           'line_items[0][price_data][product_data][description]': getDisplayCharacteristics(cat),
           'line_items[0][price_data][product_data][images][]': cat.image_1,
