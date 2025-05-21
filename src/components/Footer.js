@@ -43,6 +43,10 @@ const Footer = () => {
                 ? 'Your trusted destination for finding the perfect companion. Purebred puppies, raised with love and professional care.'
                 : 'Tu destino confiable para encontrar el compañero perfecto. Cachorros de raza pura, criados con amor y cuidado profesional.'}
             </p>
+            <p className="text-gray-400 text-sm">
+              1309 Coffeen Avenue Suite 1200,<br />
+              Sheridan, WY 82801 US
+            </p>
           </div>
 
           {/* Quick Links */}
