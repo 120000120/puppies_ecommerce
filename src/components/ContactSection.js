@@ -131,7 +131,7 @@ const ContactSection = () => {
                     : 'Contáctanos ahora para programar una cita y conocer a nuestros cachorros disponibles.'}
                 </p>
                 <a 
-                  href="https://wa.me/50661537799" 
+                  href="https://wa.me/17064097145" 
                   target="_blank" 
                   rel="noopener noreferrer" 
                   className="inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-lg shadow-lg transition-all transform hover:scale-105 w-full text-xl"

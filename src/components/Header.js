@@ -219,7 +219,7 @@ const Header = () => {
                   />
                   <span>{selectedCurrencyInfo.name}</span>
                   <svg 
-                    className={`w-5 h-5 transition-transform ${isDropdownOpen ? 'rotate-180' : ''} text-yellow-400`} 
+                    className={`w-5 h-5 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''} text-yellow-400`} 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -228,8 +228,12 @@ const Header = () => {
                   </svg>
                 </button>
 
-                {isDropdownOpen && (
-                  <div className="mt-4 bg-gray-900/80 backdrop-blur-sm rounded-xl overflow-hidden border border-yellow-500/20">
+                <div 
+                  className={`mt-4 bg-gray-900/80 backdrop-blur-sm rounded-xl overflow-hidden border border-yellow-500/20 transition-all duration-300 ease-in-out transform ${
+                    isDropdownOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+                  }`}
+                >
+                  <div className="overflow-y-auto max-h-[300px] scrollbar-thin scrollbar-thumb-yellow-500 scrollbar-track-gray-800">
                     {currencies.map((currency) => (
                       <button
                         key={currency.code}
@@ -237,25 +241,27 @@ const Header = () => {
                           setSelectedCurrency(currency.code);
                           setIsDropdownOpen(false);
                         }}
-                        className={`w-full px-6 py-4 text-left hover:bg-yellow-500/10 flex items-center space-x-3 ${
+                        className={`w-full px-6 py-4 text-left hover:bg-yellow-500/10 flex items-center space-x-3 transition-colors duration-200 ${
                           selectedCurrency === currency.code ? 'bg-yellow-500/10' : ''
                         }`}
                       >
-                        <img 
-                          src={currency.flag} 
-                          alt={currency.name} 
-                          className="w-8 h-5 object-cover rounded shadow-lg"
-                        />
+                        <div className="relative w-8 h-5">
+                          <img 
+                            src={currency.flag} 
+                            alt={currency.name} 
+                            className="w-full h-full object-cover rounded shadow-lg transition-transform duration-200 hover:scale-110"
+                          />
+                        </div>
                         <span className="text-white text-lg">{currency.name}</span>
                         {selectedCurrency === currency.code && (
-                          <svg className="w-5 h-5 text-yellow-400 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-5 h-5 text-yellow-400 ml-auto animate-fade-in" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                           </svg>
                         )}
                       </button>
                     ))}
                   </div>
-                )}
+                </div>
               </div>
             </div>
           </div>
