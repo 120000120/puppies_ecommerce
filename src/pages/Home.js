@@ -4,6 +4,7 @@ import VideoSection from '../components/VideoSection';
 import WhyChooseUs from '../components/WhyChooseUs';
 import CallToAction from '../components/CallToAction';
 import DogCard from '../components/DogCard';
+import FinancingSection from '../components/FinancingSection';
 import { supabase } from '../lib/supabase';
 import { Link } from 'react-router-dom';
 import { useCurrency } from '../context/CurrencyContext';
@@ -133,6 +134,51 @@ const Home = () => {
 
       <WhyChooseUs isEnglish={isEnglish} />
 
+      <FinancingSection isEnglish={isEnglish} />
+      <VideoSection isEnglish={isEnglish} />
+      
+      {/* Random Dogs Section */}
+      <section className="py-16 bg-gray-black text-white ">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-yellow-400 mb-4">
+              {isEnglish ? 'Our Puppies' : 'Nuestros Cachorros'}
+            </h2>
+            <p className="text-gray-300 max-w-2xl mx-auto">
+              {isEnglish
+                ? 'Explore our wide selection of available puppies to find your perfect companion.'
+                : 'Explora nuestra amplia selección de cachorros disponibles para encontrar tu compañero perfecto.'}
+            </p>
+          </div>
+          
+          {loading ? (
+            <div className="flex justify-center items-center py-16">
+              <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-yellow-400"></div>
+            </div>
+          ) : error ? (
+            <div className="flex justify-center items-center py-16">
+              <div className="text-red-500">
+                <p>Error: {error}</p>
+                <button 
+                  onClick={fetchRandomDogs}
+                  className="mt-4 px-4 py-2 bg-yellow-400 text-gray-900 rounded hover:bg-yellow-500"
+                >
+                  Try Again
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {randomDogs.map((dog) => (
+                <DogCard key={dog.id} dog={dog} />
+              ))}
+            </div>
+          )}
+          
+        </div>
+        
+      </section>
+      
       {/* Testimonials Section */}
       <section className="py-20 bg-gradient-to-b from-gray-900 to-black relative overflow-hidden">
         {/* Background decorative elements */}
@@ -207,52 +253,7 @@ const Home = () => {
             </Link>
           </div>
         </div>
-        {/* <div className="absolute bottom-0 left-0 right-0">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100" fill="#111827">
-          <path d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,100L1360,100C1280,100,1120,100,960,100C800,100,640,100,480,100C320,100,160,100,80,100L0,100Z"></path>
-        </svg>
-      </div> */}
-      </section>
-      <VideoSection isEnglish={isEnglish} />
-      
-      {/* Random Dogs Section */}
-      <section className="py-16 bg-gray-black text-white ">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-yellow-400 mb-4">
-              {isEnglish ? 'Our Puppies' : 'Nuestros Cachorros'}
-            </h2>
-            <p className="text-gray-300 max-w-2xl mx-auto">
-              {isEnglish
-                ? 'Explore our wide selection of available puppies to find your perfect companion.'
-                : 'Explora nuestra amplia selección de cachorros disponibles para encontrar tu compañero perfecto.'}
-            </p>
-          </div>
-          
-          {loading ? (
-            <div className="flex justify-center items-center py-16">
-              <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-yellow-400"></div>
-            </div>
-          ) : error ? (
-            <div className="flex justify-center items-center py-16">
-              <div className="text-red-500">
-                <p>Error: {error}</p>
-                <button 
-                  onClick={fetchRandomDogs}
-                  className="mt-4 px-4 py-2 bg-yellow-400 text-gray-900 rounded hover:bg-yellow-500"
-                >
-                  Try Again
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {randomDogs.map((dog) => (
-                <DogCard key={dog.id} dog={dog} />
-              ))}
-            </div>
-          )}
-        </div>
+
       </section>
 
       

@@ -32,7 +32,13 @@ const CatCard = ({ cat }) => {
 
   // Get the correct name and characteristics based on language
   const getName = () => {
-    return cat.name; // cats_new doesn't have name_en yet
+    if (isEnglish) {
+      if (!cat.name_en) {
+        console.warn('CatCard - name_en not found in cats_new for:', cat.name);
+      }
+      return cat.name_en || cat.name;
+    }
+    return cat.name;
   };
 
   const getCharacteristics = () => {

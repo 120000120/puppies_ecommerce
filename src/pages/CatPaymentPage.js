@@ -217,6 +217,27 @@ function CatPaymentPage() {
   };
 
   const formatPrice = (price, currency) => {
+    // Special handling for Costa Rica
+    if (currency === 'crc') {
+      // If price has more than 5 digits, use CRC
+      if (price.toString().length > 5) {
+        return new Intl.NumberFormat('es-CR', {
+          style: 'currency',
+          currency: 'CRC',
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        }).format(price);
+      } else {
+        // If price has 5 or fewer digits, use USD
+        return new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        }).format(price);
+      }
+    }
+
     // Use USD formatting for Puerto Rico
     const formatCurrency = currency === 'pr_usd' ? 'usd' : currency;
     const locale = formatCurrency === 'usd' ? 'en-US' : 
