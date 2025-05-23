@@ -23,7 +23,7 @@ const FinancingSection = ({ isEnglish }) => {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-yellow-400 mb-4">
-              {isEnglish ? 'Get Your Dream Companion Today!' : '¡Obtén tu compañero soñado hoy!'}
+              {isEnglish ? 'Buy Now, Pay Later!' : '¡Compra ahora y paga después!'}
             </h2>
             <p className="text-xl text-gray-200 max-w-3xl mx-auto">
               {isEnglish 
