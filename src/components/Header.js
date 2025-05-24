@@ -151,7 +151,7 @@ const Header = () => {
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden fixed inset-0 bg-black/95 backdrop-blur-sm z-50">
-          <div className="flex flex-col items-center justify-center h-full space-y-8">
+          <div className="flex flex-col items-center justify-start h-full overflow-y-auto">
             <button
               className="absolute top-6 right-6 text-yellow-400 hover:text-yellow-300 transition-colors"
               onClick={() => setIsMenuOpen(false)}
@@ -172,68 +172,19 @@ const Header = () => {
               </svg>
             </button>
 
-            <div className="flex flex-col items-center space-y-8 w-full px-6">
+            <div className="flex flex-col items-center w-full px-6 pt-20 pb-8">
+              {/* Logo */}
               <div className="w-24 h-24 mb-8">
                 <img src="/imagen.png" alt="Best Family Puppies Logo" className="w-full h-full object-contain" />
               </div>
 
-              <Link
-                to="/"
-                className="text-2xl font-medium text-white hover:text-yellow-400 transition-colors w-full text-center py-4 border-b border-yellow-500/20 hover:border-yellow-400"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {isEnglish ? 'Home' : 'Inicio'}
-              </Link>
-              <Link
-                to="/catalogo"
-                className="text-2xl font-medium text-white hover:text-yellow-400 transition-colors w-full text-center py-4 border-b border-yellow-500/20 hover:border-yellow-400"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {isEnglish ? 'Dogs' : 'Perros'}
-              </Link>
-              <Link
-                to="/catalogo-gatos"
-                className="text-2xl font-medium text-white hover:text-yellow-400 transition-colors w-full text-center py-4 border-b border-yellow-500/20 hover:border-yellow-400"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {isEnglish ? 'Cats' : 'Gatos'}
-              </Link>
-              <Link
-                to="/contacto"
-                className="text-2xl font-medium text-white hover:text-yellow-400 transition-colors w-full text-center py-4 border-b border-yellow-500/20 hover:border-yellow-400"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {isEnglish ? 'Contact' : 'Contacto'}
-              </Link>
-
-              {/* Mobile Currency Dropdown */}
-              <div className="w-full">
-                <button
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="w-full flex items-center justify-center space-x-3 text-2xl text-white hover:text-yellow-400 transition-colors py-4 border-b border-yellow-500/20 hover:border-yellow-400"
-                >
-                  <img 
-                    src={selectedCurrencyInfo.flag} 
-                    alt={selectedCurrencyInfo.name} 
-                    className="w-8 h-5 object-cover rounded shadow-lg"
-                  />
-                  <span>{selectedCurrencyInfo.name}</span>
-                  <svg 
-                    className={`w-5 h-5 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''} text-yellow-400`} 
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-
-                <div 
-                  className={`mt-4 bg-gray-900/80 backdrop-blur-sm rounded-xl overflow-hidden border border-yellow-500/20 transition-all duration-300 ease-in-out transform ${
-                    isDropdownOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
-                  }`}
-                >
-                  <div className="overflow-y-auto max-h-[300px] scrollbar-thin scrollbar-thumb-yellow-500 scrollbar-track-gray-800">
+              {/* Currency Selector - Now First */}
+              <div className="w-full mb-8">
+                <div className="bg-gray-800/50 rounded-xl p-4 border border-yellow-500/20">
+                  <h2 className="text-xl font-bold mb-4 text-yellow-400 text-center">
+                    {isEnglish ? 'Select Currency' : 'Seleccionar Moneda'}
+                  </h2>
+                  <div className="grid grid-cols-2 gap-3">
                     {currencies.map((currency) => (
                       <button
                         key={currency.code}
@@ -241,20 +192,20 @@ const Header = () => {
                           setSelectedCurrency(currency.code);
                           setIsDropdownOpen(false);
                         }}
-                        className={`w-full px-6 py-4 text-left hover:bg-yellow-500/10 flex items-center space-x-3 transition-colors duration-200 ${
-                          selectedCurrency === currency.code ? 'bg-yellow-500/10' : ''
+                        className={`flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 ${
+                          selectedCurrency === currency.code 
+                            ? 'bg-yellow-500/20 border-2 border-yellow-400' 
+                            : 'bg-gray-700/50 border border-gray-600 hover:bg-gray-600/50'
                         }`}
                       >
-                        <div className="relative w-8 h-5">
-                          <img 
-                            src={currency.flag} 
-                            alt={currency.name} 
-                            className="w-full h-full object-cover rounded shadow-lg transition-transform duration-200 hover:scale-110"
-                          />
-                        </div>
-                        <span className="text-white text-lg">{currency.name}</span>
+                        <img 
+                          src={currency.flag} 
+                          alt={currency.name} 
+                          className="w-8 h-5 object-cover rounded shadow-lg"
+                        />
+                        <span className="text-white text-sm font-medium">{currency.name}</span>
                         {selectedCurrency === currency.code && (
-                          <svg className="w-5 h-5 text-yellow-400 ml-auto animate-fade-in" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-5 h-5 text-yellow-400 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                           </svg>
                         )}
@@ -262,6 +213,38 @@ const Header = () => {
                     ))}
                   </div>
                 </div>
+              </div>
+
+              {/* Navigation Links */}
+              <div className="w-full space-y-2">
+                <Link
+                  to="/"
+                  className="block text-xl font-medium text-white hover:text-yellow-400 transition-colors w-full text-center py-4 bg-gray-800/50 rounded-lg hover:bg-gray-700/50"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {isEnglish ? 'Home' : 'Inicio'}
+                </Link>
+                <Link
+                  to="/catalogo"
+                  className="block text-xl font-medium text-white hover:text-yellow-400 transition-colors w-full text-center py-4 bg-gray-800/50 rounded-lg hover:bg-gray-700/50"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {isEnglish ? 'Dogs' : 'Perros'}
+                </Link>
+                <Link
+                  to="/catalogo-gatos"
+                  className="block text-xl font-medium text-white hover:text-yellow-400 transition-colors w-full text-center py-4 bg-gray-800/50 rounded-lg hover:bg-gray-700/50"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {isEnglish ? 'Cats' : 'Gatos'}
+                </Link>
+                <Link
+                  to="/contacto"
+                  className="block text-xl font-medium text-white hover:text-yellow-400 transition-colors w-full text-center py-4 bg-gray-800/50 rounded-lg hover:bg-gray-700/50"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {isEnglish ? 'Contact' : 'Contacto'}
+                </Link>
               </div>
             </div>
           </div>
