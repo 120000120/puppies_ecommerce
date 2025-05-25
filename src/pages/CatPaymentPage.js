@@ -14,6 +14,7 @@ function CatPaymentPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [stripeError, setStripeError] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [email, setEmail] = useState('');
   const { selectedCurrency, getPriceByCurrency } = useCurrency();
   const [cat, setCat] = useState(location.state?.cat);
   
@@ -100,6 +101,13 @@ function CatPaymentPage() {
 
   const handlePayment = async (e) => {
     e.preventDefault();
+    
+    // Validate email
+    if (!email || !email.includes('@')) {
+      setStripeError('Por favor ingrese un correo electrónico válido');
+      return;
+    }
+
     setIsLoading(true);
     setStripeError(null);
 
@@ -107,8 +115,13 @@ function CatPaymentPage() {
       const stripe = await stripePromise;
       const price = getPriceForCurrency(cat, selectedCurrency);
       
-      // Use 'usd' for Stripe when currency is 'pr_usd'
-      const stripeCurrency = selectedCurrency === 'pr_usd' ? 'usd' : selectedCurrency;
+      // Determine the currency for Stripe based on price for Costa Rica
+      let stripeCurrency = selectedCurrency;
+      if (selectedCurrency === 'crc') {
+        stripeCurrency = price > 9999 ? 'crc' : 'usd';
+      } else if (selectedCurrency === 'pr_usd') {
+        stripeCurrency = 'usd';
+      }
       
       const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
         method: 'POST',
@@ -127,7 +140,7 @@ function CatPaymentPage() {
           'mode': 'payment',
           'success_url': `${window.location.origin}/success?success=true`,
           'cancel_url': `${window.location.origin}/cancel`,
-          'customer_email': 'test@example.com'
+          'customer_email': email
         })
       });
 
@@ -198,6 +211,15 @@ function CatPaymentPage() {
   };
 
   const getCountryAndCurrency = (currency) => {
+    // Special handling for Costa Rica based on price
+    if (currency === 'crc') {
+      const price = getPriceForCurrency(cat, currency);
+      return {
+        country: 'Costa Rica',
+        symbol: price > 9999 ? 'CRC' : 'USD'
+      };
+    }
+
     switch (currency) {
       case 'usd':
         return { country: 'United States', symbol: 'USD' };
@@ -205,10 +227,8 @@ function CatPaymentPage() {
         return { country: 'Puerto Rico', symbol: 'USD' };
       case 'cad':
         return { country: 'Canada', symbol: 'CAD' };
-      case 'crc':
-        return { country: 'Costa Rica', symbol: 'CRC' };
       case 'nio':
-        return { country: 'El Salvador', symbol: 'SVC' };
+        return { country: 'El Salvador', symbol: 'NIO' };
       case 'pab':
         return { country: 'Panama', symbol: 'PAB' };
       default:
@@ -217,24 +237,28 @@ function CatPaymentPage() {
   };
 
   const formatPrice = (price, currency) => {
+    // Ensure price is a number
+    const numericPrice = Number(price);
+    
     // Special handling for Costa Rica
     if (currency === 'crc') {
-      // If price has more than 5 digits, use CRC
-      if (price.toString().length > 5) {
+      console.log('Price for CRC:', numericPrice, 'Type:', typeof numericPrice);
+      // If price is greater than 9999, use CRC
+      if (numericPrice > 9999) {
         return new Intl.NumberFormat('es-CR', {
           style: 'currency',
           currency: 'CRC',
           minimumFractionDigits: 0,
           maximumFractionDigits: 0
-        }).format(price);
+        }).format(numericPrice);
       } else {
-        // If price has 5 or fewer digits, use USD
+        // If price is 9999 or less, use USD
         return new Intl.NumberFormat('en-US', {
           style: 'currency',
           currency: 'USD',
           minimumFractionDigits: 0,
           maximumFractionDigits: 0
-        }).format(price);
+        }).format(numericPrice);
       }
     }
 
@@ -251,7 +275,7 @@ function CatPaymentPage() {
       currency: formatCurrency.toUpperCase(),
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
-    }).format(price);
+    }).format(numericPrice);
   };
 
   return (
@@ -352,6 +376,25 @@ function CatPaymentPage() {
 
             {/* Botón de pago */}
             <div className="bg-gray-800 p-4 rounded-lg border border-yellow-500/20">
+              <div className="mb-4">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                  {isEnglish ? 'Email Address' : 'Correo Electrónico'}
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                  placeholder={isEnglish ? "Enter your email" : "Ingrese su correo"}
+                  required
+                />
+              </div>
+              {stripeError && (
+                <div className="mb-4 text-red-500 text-sm">
+                  {stripeError}
+                </div>
+              )}
               <button
                 onClick={handlePayment}
                 disabled={isLoading}
