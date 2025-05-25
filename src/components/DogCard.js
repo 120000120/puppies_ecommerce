@@ -28,7 +28,7 @@ const DogCard = ({ dog }) => {
   }, null, 2));
   
   const { getPriceByCurrency, getDisplayCurrency, selectedCurrency } = useCurrency();
-  const displayCurrency = getDisplayCurrency(dog);
+  const displayCurrency = selectedCurrency;
   const isEnglish = selectedCurrency === 'usd' || selectedCurrency === 'cad';
 
   console.log('DogCard - Initial currency check:', JSON.stringify({
@@ -36,7 +36,8 @@ const DogCard = ({ dog }) => {
     selectedCurrency,
     isEnglish,
     price_canada: dog.price_canada,
-    price_usd: dog.price_usd
+    price_usd: dog.price_usd,
+    price_costa_rica: dog.price_costa_rica
   }, null, 2));
 
   // Get the correct name and characteristics based on language
@@ -74,6 +75,7 @@ const DogCard = ({ dog }) => {
     isEnglish,
     usdPrice: dog.price_usd,
     cadPrice: dog.price_canada,
+    crcPrice: dog.price_costa_rica,
     allPrices: {
       usd: dog.price_usd,
       cad: dog.price_canada,
@@ -106,12 +108,19 @@ const DogCard = ({ dog }) => {
           }
           return parseFloat(dog.price_canada || dog.price_usd || dog.price);
         case 'crc':
+          // Asegurarnos de usar específicamente price_costa_rica
+          const costaRicaPrice = dog.price_costa_rica;
           console.log('DogCard - Using CRC price from dogs_new:', JSON.stringify({
-            price: dog.price_costa_rica,
-            type: typeof dog.price_costa_rica,
-            raw: dog.price_costa_rica
+            price: costaRicaPrice,
+            type: typeof costaRicaPrice,
+            raw: costaRicaPrice,
+            displayCurrency,
+            selectedCurrency
           }, null, 2));
-          return parseFloat(dog.price_costa_rica);
+          if (!costaRicaPrice) {
+            console.warn('DogCard - CRC price not found in dogs_new for:', dog.name);
+          }
+          return parseFloat(costaRicaPrice);
         case 'nio':
           console.log('DogCard - Using NIO price from dogs_new (El Salvador):', JSON.stringify({
             price: dog.price_salvador,
@@ -144,7 +153,9 @@ const DogCard = ({ dog }) => {
                      displayCurrency === 'crc' ? dog.price_costa_rica :
                      displayCurrency === 'nio' ? dog.price_salvador :
                      displayCurrency === 'pab' ? dog.price_panama :
-                     dog.price_usd || dog.price
+                     dog.price_usd || dog.price,
+      displayCurrency,
+      selectedCurrency
     }, null, 2));
     return price;
   };
@@ -163,7 +174,17 @@ const DogCard = ({ dog }) => {
         case 'cad':
           return { country: isEnglish ? 'Canada' : 'Canadá', symbol: 'CAD' };
         case 'crc':
-          return { country: 'Costa Rica', symbol: 'CRC' };
+          // Special handling for Costa Rica based on price
+          const price = getPrice();
+          console.log('DogCard - Costa Rica currency info:', {
+            price,
+            price_costa_rica: dog.price_costa_rica,
+            selectedCurrency: currency
+          });
+          return {
+            country: 'Costa Rica',
+            symbol: price > 9999 ? 'CRC' : 'USD'
+          };
         case 'nio':
           return { country: 'El Salvador', symbol: 'SVC' };
         case 'pab':
@@ -186,6 +207,34 @@ const DogCard = ({ dog }) => {
   };
 
   const formatPrice = (price) => {
+    // Special handling for Costa Rica
+    if (displayCurrency === 'crc') {
+      const numericPrice = Number(price);
+      console.log('DogCard - Formatting CRC price:', {
+        price: numericPrice,
+        price_costa_rica: dog.price_costa_rica,
+        displayCurrency,
+        selectedCurrency
+      });
+      // If price is greater than 9999, use CRC
+      if (numericPrice > 9999) {
+        return new Intl.NumberFormat('es-CR', {
+          style: 'currency',
+          currency: 'CRC',
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        }).format(numericPrice);
+      } else {
+        // If price is 9999 or less, use USD
+        return new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        }).format(numericPrice);
+      }
+    }
+
     // Use USD formatting for Puerto Rico
     const formatCurrency = displayCurrency === 'pr_usd' ? 'usd' : displayCurrency;
     const locale = formatCurrency === 'usd' ? 'en-US' : 
@@ -222,7 +271,7 @@ const DogCard = ({ dog }) => {
       price_canada: dog.price_canada || dog.price_usd || dog.price,
       price_salvador: dog.price_salvador || dog.price_usd || dog.price,
       price_panama: dog.price_panama || dog.price_usd || dog.price,
-      price_costa_rica: dog.price_costa_rica || dog.price_usd || dog.price,
+      price_costa_rica: dog.price_costa_rica,
       characteristics: displayCharacteristics,
       characteristics_en: dog.characteristics_en || dog.characteristics,
       size: dog.size,
@@ -236,7 +285,8 @@ const DogCard = ({ dog }) => {
       image_5: dog.image_5,
       image_6: dog.image_6,
       image_father_1: dog.image_father_1,
-      image_father_2: dog.image_father_2
+      image_father_2: dog.image_father_2,
+      selectedCurrency: displayCurrency
     };
     
     console.log('DogCard - Dog data for payment from dogs_new:', JSON.stringify(dogData, null, 2));
@@ -338,7 +388,7 @@ const DogCard = ({ dog }) => {
                     price_canada: dog.price_canada || dog.price_usd || dog.price,
                     price_salvador: dog.price_salvador || dog.price_usd || dog.price,
                     price_panama: dog.price_panama || dog.price_usd || dog.price,
-                    price_costa_rica: dog.price_costa_rica || dog.price_usd || dog.price,
+                    price_costa_rica: dog.price_costa_rica,
                     characteristics: displayCharacteristics,
                     characteristics_en: dog.characteristics_en || dog.characteristics,
                     size: dog.size,
@@ -352,7 +402,8 @@ const DogCard = ({ dog }) => {
                     image_5: dog.image_5,
                     image_6: dog.image_6,
                     image_father_1: dog.image_father_1,
-                    image_father_2: dog.image_father_2
+                    image_father_2: dog.image_father_2,
+                    selectedCurrency: displayCurrency
                   }
                 }}
                 onClick={handleClick}

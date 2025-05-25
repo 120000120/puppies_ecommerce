@@ -100,10 +100,20 @@ function PaymentPage() {
         if (error) throw error;
         
         if (data) {
+          // Preservar los precios originales del estado inicial
+          const updatedData = {
+            ...data,
+            price_usd: dog?.price_usd || cat?.price_usd,
+            price_canada: dog?.price_canada || cat?.price_canada,
+            price_costa_rica: dog?.price_costa_rica || cat?.price_costa_rica,
+            price_salvador: dog?.price_salvador || cat?.price_salvador,
+            price_panama: dog?.price_panama || cat?.price_panama
+          };
+
           if (dog) {
-            setDog(data);
+            setDog(updatedData);
           } else {
-            setCat(data);
+            setCat(updatedData);
           }
         }
       } catch (error) {
@@ -248,7 +258,13 @@ function PaymentPage() {
         price = pet.price_canada;
         break;
       case 'crc':
+        // Asegurarnos de usar específicamente price_costa_rica
         price = pet.price_costa_rica;
+        console.log('CRC Price:', {
+          price_costa_rica: pet.price_costa_rica,
+          selectedCurrency: code,
+          finalPrice: price
+        });
         break;
       case 'nio':
         price = pet.price_salvador;
@@ -267,6 +283,11 @@ function PaymentPage() {
     // Special handling for Costa Rica based on price
     if (currency === 'crc') {
       const price = getPriceForCurrency(dog || cat, currency);
+      console.log('Costa Rica Price Check:', {
+        price,
+        price_costa_rica: (dog || cat)?.price_costa_rica,
+        selectedCurrency: currency
+      });
       return {
         country: 'Costa Rica',
         symbol: price > 9999 ? 'CRC' : 'USD'
@@ -295,7 +316,11 @@ function PaymentPage() {
     
     // Special handling for Costa Rica
     if (currency === 'crc') {
-      console.log('Price for CRC:', numericPrice, 'Type:', typeof numericPrice);
+      console.log('Formatting CRC Price:', {
+        numericPrice,
+        price_costa_rica: (dog || cat)?.price_costa_rica,
+        selectedCurrency: currency
+      });
       // If price is greater than 9999, use CRC
       if (numericPrice > 9999) {
         return new Intl.NumberFormat('es-CR', {
