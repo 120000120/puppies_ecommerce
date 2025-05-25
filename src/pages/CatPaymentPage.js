@@ -14,7 +14,6 @@ function CatPaymentPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [stripeError, setStripeError] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [email, setEmail] = useState('');
   const { selectedCurrency, getPriceByCurrency } = useCurrency();
   const [cat, setCat] = useState(location.state?.cat);
   
@@ -101,13 +100,6 @@ function CatPaymentPage() {
 
   const handlePayment = async (e) => {
     e.preventDefault();
-    
-    // Validate email
-    if (!email || !email.includes('@')) {
-      setStripeError('Por favor ingrese un correo electrónico válido');
-      return;
-    }
-
     setIsLoading(true);
     setStripeError(null);
 
@@ -139,8 +131,7 @@ function CatPaymentPage() {
           'line_items[0][quantity]': '1',
           'mode': 'payment',
           'success_url': `${window.location.origin}/success?success=true`,
-          'cancel_url': `${window.location.origin}/cancel`,
-          'customer_email': email
+          'cancel_url': `${window.location.origin}/cancel`
         })
       });
 
@@ -376,20 +367,6 @@ function CatPaymentPage() {
 
             {/* Botón de pago */}
             <div className="bg-gray-800 p-4 rounded-lg border border-yellow-500/20">
-              <div className="mb-4">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                  {isEnglish ? 'Email Address' : 'Correo Electrónico'}
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                  placeholder={isEnglish ? "Enter your email" : "Ingrese su correo"}
-                  required
-                />
-              </div>
               {stripeError && (
                 <div className="mb-4 text-red-500 text-sm">
                   {stripeError}
