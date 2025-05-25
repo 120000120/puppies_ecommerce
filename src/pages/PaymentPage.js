@@ -234,24 +234,41 @@ function PaymentPage() {
 
   const getPriceForCurrency = (pet, code) => {
     if (!pet) return 0;
+    let price;
     switch (code) {
       case 'usd':
       case 'pr_usd': // Puerto Rico uses USD prices
-        return pet.price_usd || pet.price;
+        price = pet.price_usd || pet.price;
+        break;
       case 'cad':
-        return pet.price_canada;
+        price = pet.price_canada;
+        break;
       case 'crc':
-        return pet.price_costa_rica;
+        price = pet.price_costa_rica;
+        break;
       case 'nio':
-        return pet.price_salvador;
+        price = pet.price_salvador;
+        break;
       case 'pab':
-        return pet.price_panama;
+        price = pet.price_panama;
+        break;
       default:
-        return pet.price_usd || pet.price;
+        price = pet.price_usd || pet.price;
     }
+    // Ensure we return a number
+    return Number(price);
   };
 
   const getCountryAndCurrency = (currency) => {
+    // Special handling for Costa Rica based on price
+    if (currency === 'crc') {
+      const price = getPriceForCurrency(dog || cat, currency);
+      return {
+        country: 'Costa Rica',
+        symbol: price > 9999 ? 'CRC' : 'USD'
+      };
+    }
+
     switch (currency) {
       case 'usd':
         return { country: 'United States', symbol: 'USD' };
@@ -259,8 +276,6 @@ function PaymentPage() {
         return { country: 'Puerto Rico', symbol: 'USD' };
       case 'cad':
         return { country: 'Canada', symbol: 'CAD' };
-      case 'crc':
-        return { country: 'Costa Rica', symbol: 'CRC' };
       case 'nio':
         return { country: 'El Salvador', symbol: 'NIO' };
       case 'pab':
@@ -271,24 +286,28 @@ function PaymentPage() {
   };
 
   const formatPrice = (price, currency) => {
+    // Ensure price is a number
+    const numericPrice = Number(price);
+    
     // Special handling for Costa Rica
     if (currency === 'crc') {
-      // If price has more than 5 digits, use CRC
-      if (price.toString().length > 5) {
+      console.log('Price for CRC:', numericPrice, 'Type:', typeof numericPrice);
+      // If price is greater than 9999, use CRC
+      if (numericPrice > 9999) {
         return new Intl.NumberFormat('es-CR', {
           style: 'currency',
           currency: 'CRC',
           minimumFractionDigits: 0,
           maximumFractionDigits: 0
-        }).format(price);
+        }).format(numericPrice);
       } else {
-        // If price has 5 or fewer digits, use USD
+        // If price is 9999 or less, use USD
         return new Intl.NumberFormat('en-US', {
           style: 'currency',
           currency: 'USD',
           minimumFractionDigits: 0,
           maximumFractionDigits: 0
-        }).format(price);
+        }).format(numericPrice);
       }
     }
 
@@ -305,7 +324,7 @@ function PaymentPage() {
       currency: formatCurrency.toUpperCase(),
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
-    }).format(price);
+    }).format(numericPrice);
   };
 
   return (
