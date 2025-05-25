@@ -128,8 +128,13 @@ function PaymentPage() {
       const pet = dog || cat;
       const price = getPriceForCurrency(pet, selectedCurrency);
       
-      // Use 'usd' for Stripe when currency is 'pr_usd'
-      const stripeCurrency = selectedCurrency === 'pr_usd' ? 'usd' : selectedCurrency;
+      // Determine the currency for Stripe based on price for Costa Rica
+      let stripeCurrency = selectedCurrency;
+      if (selectedCurrency === 'crc') {
+        stripeCurrency = price > 9999 ? 'crc' : 'usd';
+      } else if (selectedCurrency === 'pr_usd') {
+        stripeCurrency = 'usd';
+      }
       
       const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
         method: 'POST',
