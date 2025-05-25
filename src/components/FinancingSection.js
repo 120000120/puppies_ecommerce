@@ -8,7 +8,7 @@ const FinancingSection = ({ isEnglish }) => {
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-8 items-center">
             {/* Left Column - Video */}
-            <div className="relative aspect-[9/16] max-w-md mx-auto lg:mx-0">
+            <div className="relative aspect-[9/16] max-w-md mx-auto lg:mx-0 order-2 lg:order-1">
               <video
                 autoPlay
                 loop
@@ -22,7 +22,7 @@ const FinancingSection = ({ isEnglish }) => {
             </div>
 
             {/* Right Column - Content */}
-            <div className="space-y-8">
+            <div className="space-y-8 order-1 lg:order-2">
               <div className="text-center lg:text-left">
                 <h2 className="text-4xl font-bold text-yellow-400 mb-4">
                   {isEnglish ? 'Buy Now, Pay Later!' : '¡Compra ahora y paga después!'}
