@@ -107,11 +107,11 @@ function CatPaymentPage() {
       const stripe = await stripePromise;
       const price = getPriceForCurrency(cat, selectedCurrency);
       
-      // Determine the currency for Stripe based on price for Costa Rica
+      // Determine the currency for Stripe based on price for Costa Rica and El Salvador
       let stripeCurrency = selectedCurrency;
       if (selectedCurrency === 'crc') {
         stripeCurrency = price > 9999 ? 'crc' : 'usd';
-      } else if (selectedCurrency === 'pr_usd') {
+      } else if (selectedCurrency === 'pr_usd' || selectedCurrency === 'nio') {
         stripeCurrency = 'usd';
       }
       
@@ -253,12 +253,11 @@ function CatPaymentPage() {
       }
     }
 
-    // Use USD formatting for Puerto Rico
-    const formatCurrency = currency === 'pr_usd' ? 'usd' : currency;
+    // Use USD formatting for Puerto Rico and El Salvador
+    const formatCurrency = (currency === 'pr_usd' || currency === 'nio') ? 'usd' : currency;
     const locale = formatCurrency === 'usd' ? 'en-US' : 
                   formatCurrency === 'cad' ? 'en-CA' : 
                   formatCurrency === 'crc' ? 'es-CR' :
-                  formatCurrency === 'nio' ? 'es-NI' :
                   'es-PA';
 
     return new Intl.NumberFormat(locale, {

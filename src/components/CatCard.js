@@ -70,7 +70,7 @@ const CatCard = ({ cat }) => {
         case 'crc':
           return { country: 'Costa Rica', symbol: 'CRC' };
         case 'nio':
-          return { country: 'El Salvador', symbol: 'SVC' };
+          return { country: 'El Salvador', symbol: 'NIO' };
         case 'pab':
           return { country: 'Panamá', symbol: 'PAB' };
         default:
@@ -90,12 +90,39 @@ const CatCard = ({ cat }) => {
   };
 
   const formatPrice = (price) => {
-    // Use USD formatting for Puerto Rico
-    const formatCurrency = displayCurrency === 'pr_usd' ? 'usd' : displayCurrency;
+    // Special handling for Costa Rica
+    if (displayCurrency === 'crc') {
+      const numericPrice = Number(price);
+      console.log('CatCard - Formatting CRC price:', {
+        price: numericPrice,
+        price_costa_rica: cat.price_costa_rica,
+        displayCurrency,
+        selectedCurrency
+      });
+      // If price is greater than 9999, use CRC
+      if (numericPrice > 9999) {
+        return new Intl.NumberFormat('es-CR', {
+          style: 'currency',
+          currency: 'CRC',
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        }).format(numericPrice);
+      } else {
+        // If price is 9999 or less, use USD
+        return new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        }).format(numericPrice);
+      }
+    }
+
+    // Use USD formatting for Puerto Rico and El Salvador
+    const formatCurrency = (displayCurrency === 'pr_usd' || displayCurrency === 'nio') ? 'usd' : displayCurrency;
     const locale = formatCurrency === 'usd' ? 'en-US' : 
                   formatCurrency === 'cad' ? 'en-CA' : 
                   formatCurrency === 'crc' ? 'es-CR' :
-                  formatCurrency === 'nio' ? 'es-NI' :
                   'es-PA';
 
     const formattedPrice = new Intl.NumberFormat(locale, {
