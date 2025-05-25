@@ -138,11 +138,11 @@ function PaymentPage() {
       const pet = dog || cat;
       const price = getPriceForCurrency(pet, selectedCurrency);
       
-      // Determine the currency for Stripe based on price for Costa Rica
+      // Determine the currency for Stripe based on price for Costa Rica and El Salvador
       let stripeCurrency = selectedCurrency;
       if (selectedCurrency === 'crc') {
         stripeCurrency = price > 9999 ? 'crc' : 'usd';
-      } else if (selectedCurrency === 'pr_usd') {
+      } else if (selectedCurrency === 'pr_usd' || selectedCurrency === 'nio') {
         stripeCurrency = 'usd';
       }
       
