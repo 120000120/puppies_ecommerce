@@ -186,7 +186,7 @@ const DogCard = ({ dog }) => {
             symbol: price > 9999 ? 'CRC' : 'USD'
           };
         case 'nio':
-          return { country: 'El Salvador', symbol: 'SVC' };
+          return { country: 'El Salvador', symbol: 'USD' };
         case 'pab':
           return { country: 'Panamá', symbol: 'PAB' };
         default:
@@ -235,12 +235,11 @@ const DogCard = ({ dog }) => {
       }
     }
 
-    // Use USD formatting for Puerto Rico
-    const formatCurrency = displayCurrency === 'pr_usd' ? 'usd' : displayCurrency;
+    // Use USD formatting for Puerto Rico and El Salvador
+    const formatCurrency = (displayCurrency === 'pr_usd' || displayCurrency === 'nio') ? 'usd' : displayCurrency;
     const locale = formatCurrency === 'usd' ? 'en-US' : 
                   formatCurrency === 'cad' ? 'en-CA' : 
                   formatCurrency === 'crc' ? 'es-CR' :
-                  formatCurrency === 'nio' ? 'es-NI' :
                   'es-PA';
 
     const formattedPrice = new Intl.NumberFormat(locale, {

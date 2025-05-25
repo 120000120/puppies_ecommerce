@@ -340,12 +340,11 @@ function PaymentPage() {
       }
     }
 
-    // Use USD formatting for Puerto Rico
-    const formatCurrency = currency === 'pr_usd' ? 'usd' : currency;
+    // Use USD formatting for Puerto Rico and El Salvador
+    const formatCurrency = (currency === 'pr_usd' || currency === 'nio') ? 'usd' : currency;
     const locale = formatCurrency === 'usd' ? 'en-US' : 
                   formatCurrency === 'cad' ? 'en-CA' : 
                   formatCurrency === 'crc' ? 'es-CR' :
-                  formatCurrency === 'nio' ? 'es-NI' :
                   'es-PA';
 
     return new Intl.NumberFormat(locale, {
