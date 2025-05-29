@@ -146,21 +146,19 @@ function PaymentPage() {
         stripeCurrency = 'usd';
       }
       
-      const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': `Bearer ${process.env.REACT_APP_STRIPE_SECRET_KEY}`
-        },
-        body: new URLSearchParams({
-          'payment_method_types[]': 'card',
-          'line_items[0][price_data][currency]': stripeCurrency,
-          'line_items[0][price_data][product_data][name]': getDisplayName(pet),
-          'line_items[0][price_data][product_data][description]': getDisplayCharacteristics(pet),
-          'line_items[0][price_data][product_data][images][]': pet.image_1,
-          'line_items[0][price_data][unit_amount]': Math.round(price * 100),
-          'line_items[0][quantity]': '1',
-          'mode': 'payment',
+      const res = await fetch('/api/create-checkout-session', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    productName: pet?.name || 'Best Family Puppy',
+    productPrice: price,
+    currency: 'usd',
+  }),
+});
+
+const session = await res.json();
           'success_url': `${window.location.origin}/success?success=true`,
           'cancel_url': `${window.location.origin}/cancel`
         })
