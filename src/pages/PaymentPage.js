@@ -146,7 +146,7 @@ function PaymentPage() {
         stripeCurrency = 'usd';
       }
       
-      const res = await fetch('/api/create-checkout-session', {
+      const res = await fetch("/api/crear/pagar/sesion", {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
