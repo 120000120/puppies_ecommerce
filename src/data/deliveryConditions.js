@@ -30,8 +30,8 @@ export const deliveryConditions = {
         "9. Free medical consultation for 6 months",
         "Virtual veterinary care at no cost during the first six months.",
         "",
-        "10. Free delivery to all United States and Canada",
-        "Door-to-door shipping fully included, fast and secure.",
+        "10. Special adoption gift - 80% off training program",
+        "By adopting your pet, you'll receive a special gift of 80% discount on our canine and feline training program.",
         "",
         "11. Complete medical record",
         "Includes: Heart examination, Hearing check, Skin and coat evaluation, Bone system analysis, Blood test",
@@ -64,8 +64,8 @@ export const deliveryConditions = {
         "7. Consultas médicas virtuales GRATIS por 3 meses",
         "Ofrecemos asistencia veterinaria sin costo adicional, a través de consultas virtuales, durante los primeros 90 días para que siempre tengas el apoyo necesario.",
         "",
-        "8. Servicio de entrega a domicilio disponible",
-        "Realizamos entregas a domicilio una vez a la semana. El servicio de entrega tiene un costo adicional, pero te aseguramos que tu cachorro llegará de manera segura y profesional hasta la puerta de tu hogar."
+        "8. Regalo especial por adopción - 80% de descuento en programa de adiestramiento",
+        "Al adoptar tu mascota obtendrás un regalo especial del 80% de descuento en el programa de adiestramiento canino y felino."
       ]
     },
     nio: {
@@ -92,8 +92,8 @@ export const deliveryConditions = {
         "7. Consultas médicas virtuales GRATIS por 3 meses",
         "Ofrecemos asistencia veterinaria sin costo adicional, a través de consultas virtuales, durante los primeros 90 días para que siempre tengas el apoyo necesario.",
         "",
-        "8. Servicio de entrega a domicilio disponible",
-        "Realizamos entregas a domicilio una vez a la semana. El servicio de entrega tiene un costo adicional, pero te aseguramos que tu cachorro llegará de manera segura y profesional hasta la puerta de tu hogar."
+        "8. Regalo especial por adopción - 80% de descuento en programa de adiestramiento",
+        "Al adoptar tu mascota obtendrás un regalo especial del 80% de descuento en el programa de adiestramiento canino y felino."
       ]
     },
     crc: {
@@ -123,8 +123,8 @@ export const deliveryConditions = {
         "8. Tienda física en Costa Rica",
         "Contamos con una tienda física donde puedes visitarnos, conocer a los cachorros y adquirir productos de calidad con total confianza.",
         "",
-        "9. Servicio de entrega a domicilio disponible",
-        "Llevamos a tu cachorro de manera segura y profesional hasta la puerta de tu hogar. Este servicio está disponible en todo el país y no tiene costo adicional."
+        "9. Regalo especial por adopción - 80% de descuento en programa de adiestramiento",
+        "Al adoptar tu mascota obtendrás un regalo especial del 80% de descuento en el programa de adiestramiento canino y felino."
       ]
     }
   },
@@ -159,8 +159,8 @@ export const deliveryConditions = {
         "9. Free medical consultation for 6 months",
         "Virtual veterinary care at no cost during the first six months.",
         "",
-        "10. Free delivery to all United States and Canada",
-        "Door-to-door shipping fully included, fast and secure.",
+        "10. Special adoption gift - 80% off training program",
+        "By adopting your pet, you'll receive a special gift of 80% discount on our canine and feline training program.",
         "",
         "11. Complete medical record",
         "Includes: Heart examination, Hearing check, Skin and coat evaluation, Bone system analysis, Blood test",
@@ -193,8 +193,8 @@ export const deliveryConditions = {
         "7. Consultas médicas virtuales GRATIS por 3 meses",
         "Ofrecemos asistencia veterinaria sin costo adicional, a través de consultas virtuales, durante los primeros 90 días para que siempre tengas el apoyo necesario.",
         "",
-        "8. Servicio de entrega a domicilio disponible",
-        "Realizamos entregas a domicilio una vez a la semana. El servicio de entrega tiene un costo adicional, pero te aseguramos que tu cachorro llegará de manera segura y profesional hasta la puerta de tu hogar."
+        "8. Regalo especial por adopción - 80% de descuento en programa de adiestramiento",
+        "Al adoptar tu mascota obtendrás un regalo especial del 80% de descuento en el programa de adiestramiento canino y felino."
       ]
     },
     nio: {
@@ -221,8 +221,8 @@ export const deliveryConditions = {
         "7. Consultas médicas virtuales GRATIS por 3 meses",
         "Ofrecemos asistencia veterinaria sin costo adicional, a través de consultas virtuales, durante los primeros 90 días para que siempre tengas el apoyo necesario.",
         "",
-        "8. Servicio de entrega a domicilio disponible",
-        "Realizamos entregas a domicilio una vez a la semana. El servicio de entrega tiene un costo adicional, pero te aseguramos que tu cachorro llegará de manera segura y profesional hasta la puerta de tu hogar."
+        "8. Regalo especial por adopción - 80% de descuento en programa de adiestramiento",
+        "Al adoptar tu mascota obtendrás un regalo especial del 80% de descuento en el programa de adiestramiento canino y felino."
       ]
     },
     crc: {
@@ -252,8 +252,8 @@ export const deliveryConditions = {
         "8. Tienda física en Costa Rica",
         "Contamos con una tienda física donde puedes visitarnos, conocer a los cachorros y adquirir productos de calidad con total confianza.",
         "",
-        "9. Servicio de entrega a domicilio disponible",
-        "Llevamos a tu cachorro de manera segura y profesional hasta la puerta de tu hogar. Este servicio está disponible en todo el país y no tiene costo adicional."
+        "9. Regalo especial por adopción - 80% de descuento en programa de adiestramiento",
+        "Al adoptar tu mascota obtendrás un regalo especial del 80% de descuento en el programa de adiestramiento canino y felino."
       ]
     }
   }

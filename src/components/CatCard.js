@@ -70,7 +70,7 @@ const CatCard = ({ cat }) => {
         case 'crc':
           return { country: 'Costa Rica', symbol: 'CRC' };
         case 'nio':
-          return { country: 'El Salvador', symbol: 'NIO' };
+          return { country: 'El Salvador', symbol: 'USD' };
         case 'pab':
           return { country: 'Panamá', symbol: 'PAB' };
         default:
@@ -82,7 +82,7 @@ const CatCard = ({ cat }) => {
       ...info,
       price: currency === 'cad' ? cat.price_canada : 
              currency === 'crc' ? cat.price_costa_rica :
-             currency === 'nio' ? cat.price_salvador :
+             currency === 'USD' ? cat.price_salvador :
              currency === 'pab' ? cat.price_panama :
              cat.price
     }, null, 2));
