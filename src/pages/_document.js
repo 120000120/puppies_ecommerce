@@ -4,7 +4,7 @@ export default function Document() {
   return (
     <Html lang="es">
       <Head>
-        <meta name="facebook-domain-verification" content="kheyktewwk8nzmhvw0w1pv83i07xjr" />
+        <meta name="facebook-domain-verification" content="6ikqjdb9og5jlv4mxi6ppj4r6q4nn2" />
       </Head>
       <body>
         <Main />
